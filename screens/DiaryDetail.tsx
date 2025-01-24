@@ -1,0 +1,246 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ */
+
+import React , {useEffect, useState } from 'react';
+import {
+  Image,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Modal,
+  Pressable,
+} from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+
+const setEmoteType = (emote: any) => {
+  const emoteList = ['😊', '😥', '😡', '😭', '🤣'];
+
+  return emoteList[emote-1];
+}
+
+const setMonthName = (month: number) => {
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  return monthNames[month];
+}
+
+type Diary = {
+  content: string;
+  diary_date: string;
+  feeling: number;
+  id: number;
+  title: string;
+  user_id: string;
+  privacy: string;
+};
+
+const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
+  const { clickdate , clickmonth , clickyear, userid} = route.params;
+  const [ diary, setDiary] = useState<Diary | null>(null);
+  const [date, setDate] = useState(clickdate);
+  const [month, setMonth] = useState(clickmonth);
+  const [year, setYear] = useState(clickyear);
+  const [modalVisible, setModalVisible] = useState(false);
+  const now = new Date().getDate();
+  const nowMonth = new Date().getMonth();
+  const emoteToday = setEmoteType(diary?.feeling);
+  const monthName = setMonthName(clickmonth);
+
+
+  const movebackward = () =>{
+    setDate(date-1);
+    console.log("backward work");
+    //fetchUsers(userid, `${year}-${month+1}-${date}`);
+  }
+
+  const moveforward = () =>{
+    setDate(date+1);
+    console.log("frontward work");
+    //fetchUsers(userid, `${year}-${month+1}-${date}`);
+  }
+
+  const fetchUsers = async (userId: string, diaryDate: string) => {
+    try {
+      const response = await fetch(`http://10.0.2.2:80/Detail`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user_id: userId, diary_date: diaryDate }),
+        }
+      );
+      const json = await response.json();
+      if (json.success) {
+        setDiary(json.data[0]);
+      } else {
+        console.error('API error:', json);
+        setDiary(null);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers(userid, `${year}-${month+1}-${date}`);
+  }, [date]);
+
+  //console.log(`${year}-${month+1}-${date}`);
+  //console.log(diary);
+
+  return (
+    <View style={styles.container}>
+      <View style={[styles.cardContainer, styles.row, {height: '5%'}]}>
+        <TouchableOpacity onPress={() => movebackward()} style={styles.arrowBox}>
+          <Text style={styles.Text}>◀</Text>
+        </TouchableOpacity>
+        <View style={styles.headerBox}>
+          <Text style={styles.Text}>📅 {month+1}/{date} Today</Text>
+        </View>
+        <TouchableOpacity onPress={() => moveforward()} style={styles.arrowBox}>
+          <Text style={styles.Text}>▶</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={[styles.cardContainer, { height : '80%'}]}>
+        <View style={{flexDirection: 'row', width: '100%', height: '10%'}}>
+          <Text style={{width:'20%',height:'100%', textAlign: 'center', fontSize: 30 }}>{emoteToday}
+          </Text>
+          <TouchableOpacity onPress={() => setModalVisible(true)} style={{width:'70%', height: '100%', alignItems: 'center'}}>
+            <Text style={{fontSize: 30, width: '100%', textAlign: 'right'}}>{'\u22EE'}</Text>
+          </TouchableOpacity>
+          <Pressable onPress={() => setModalVisible(false)} style={{width:'100%', height:'100%'}}>
+            <View style={{width:'100%', height:'100%'}}>
+              <Modal
+                animationType="none"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                  setModalVisible(false);
+                  }}
+                >
+                  <View style={{width:'100%', height: '23%'}}></View>
+                  <View style={{flexDirection: 'row'}}>
+                  <View style={{width:'66%'}}></View>
+                    <View style={styles.modal}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Edit')}>
+                      <Text style={styles.Text}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setModalVisible(false)}>
+                      <Text style={styles.Text}>Close</Text>
+                    </TouchableOpacity>
+                    </View>
+                    </View>
+              </Modal>
+            </View>
+          </Pressable>
+        </View>
+
+        <View style={{flexDirection: 'row', width: '100%', height: '5%'}}>
+          <View style={styles.highlightBox}>
+            <Text style={[styles.Text, {textAlign: 'center'}]}>
+              🕗 {monthName} {date}</Text>
+          </View>
+        </View>
+
+        <View style={{flexDirection: 'row', width: '100%', height: '10%', marginTop: "5%",marginBottom: '5%'}}>
+          <View style={{width: '70%', height: '100%', margin: '5%'}}>
+            {diary == null ? <Text></Text>
+            : <Text style={styles.titleText}>{diary.title}</Text>
+            }
+          </View>
+        </View>
+          
+        <View style={{flexDirection: 'row', height: '70%', width: '90%', alignItems: 'center'}}>
+          <View style={{width: '100%', height: '90%', alignItems: 'center'}}>
+            {diary == null ? <Text>작성된 일기가 없습니다.</Text>
+            : <Text style={styles.Text}>{diary.content}</Text>
+            }
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: "white"
+  },
+  cardContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    width: '90%',
+    margin: '5%',
+    padding: '1.5%',  
+    shadowColor: '#FF5C85',
+    shadowOffset: {
+      width: 5,
+      height: 8,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 8,
+    alignItems: 'center',
+  },
+  arrowBox: {
+    width: '20%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerBox:{
+    width: '60%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  Text: {
+    fontFamily: 'Manrope',
+    fontSize: 17,
+    lineHeight: 24,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  spaceBetween: {
+    justifyContent: 'space-between',
+  },
+  highlightBox: {
+    backgroundColor: '#F5BFD9',
+    borderRadius: 10,
+    width: '40%',
+    height: '100%',
+    padding: '1%',
+    margin: '3%',
+  },
+  logoImage: {
+    width: 100,
+    height: 100,
+  },
+  titleText: {
+    fontWeight: 'bold',
+    fontSize: 40,
+    fontFamily: 'Manrope',
+  },
+  modal: {
+    width: '20%',
+    height: '40%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: 'black',
+    borderWidth: 5,
+  }
+});
+
+export default DiaryDetailScreen;
