@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     SafeAreaView,
     View,
@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const apiClient = axios.create({
     baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
@@ -80,14 +81,9 @@ const PreDiaryQuestionsScreen: React.FC<{ navigation: any }> = ({ navigation }) 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Icon
-                    name="chevron-back"
-                    size={24}
-                    color="black"
-                    onPress={handlePrevDate}
-                />
+                <Text style={styles.Text} onPress={handlePrevDate}>◀</Text>
                 <Text style={styles.dateText}>{formatDate(date)}</Text>
-                <Icon name="chevron-forward" size={24} color="black" onPress={handleNextDate} />
+                <Text style={styles.Text} onPress={handleNextDate}>▶</Text>
             </View>
 
             {randomQuestions.map((question, index) => (
@@ -109,6 +105,7 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
     const [content, setContent] = useState('');
     const [mood, setMood] = useState<string | null>(null);
     const [privacy, setPrivacy] = useState<'Private' | 'Couple' | null>('Private');
+    const [user_id, setUser_id] = useState<string>('');
 
     const formatDate = (date: Date) => {
         return `${date.getMonth() + 1}/${date.getDate()}`;
@@ -135,33 +132,79 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
         return emoji ? moods.indexOf(emoji) + 1 : 0;
     };
 
-    const handleSave =  () => {
+    useEffect(() => {
+        const getUserInfo = async () => {
+          try {
+            const user = await AsyncStorage.getItem('userInfo');
+            if (user) {
+              const parsedUser = JSON.parse(user);
+              setUser_id(parsedUser.id);
+            }
+          } catch (error) {
+            console.error('Error fetching user info:', error);
+          }
+        };
+        getUserInfo();
+    }, []);
+
+    const handleSave = async () => {
+        if (!headline || !content || !mood) {
+            Alert.alert('모든 칸을 채우거나 기분을 체크해주세요!');
+            return;
+        }
         // Save diary data
         const diaryData = {
             title: headline,
-            user_id: 'user123', // Replace with dynamic user ID if applicable
+            user_id: user_id,
             content,
             feeling: getMoodIndex(mood),
             privacy,
-            diary_date: date.toISOString().split('T')[0],
+            diary_date: `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`,
         };
-        axios.post('http://10.0.2.2:80/api/diary', diaryData);
-
-        // Navigate to diary detail screen
-        navigation.navigate('Detail', {
-        });
+        try {
+            const response = await fetch('http://10.0.2.2:80/write-diary', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title : diaryData.title, 
+                    user_id : diaryData.user_id, 
+                    content : diaryData.content, 
+                    feeling : diaryData.feeling, 
+                    privacy : diaryData.privacy, 
+                    diary_date : diaryData.diary_date
+                }),
+            });
+            if (response && response.status === 200) {
+                // Navigate to diary detail screen
+                navigation.navigate('Detail', {
+                    clickdate: date.getDate(), 
+                    clickmonth: date.getMonth(),
+                    clickyear: date.getFullYear(),
+                    userid: user_id,
+                });
+            } else if (response.status === 401) {
+                Alert.alert('이미 일기를 썼습니다.');
+            }
+            else {
+                Alert.alert('Failed to save diary data');
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                Alert.alert('이미 일기를 썼습니다.');
+            }
+            console.error('Error saving diary data:', error);
+            Alert.alert('Failed to save diary data');
+        }
     };
-        return (
+
+    return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Icon
-                    name="chevron-back"
-                    size={24}
-                    color="black"
-                    onPress={handlePrevDate}
-                />
+                <Text style={styles.Text} onPress={handlePrevDate}>◀</Text>
                 <Text style={styles.dateText}>{formatDate(date)}</Text>
-                <Icon name="chevron-forward" size={24} color="black" onPress={handleNextDate} />
+                <Text style={styles.Text} onPress={handleNextDate}>▶</Text>
             </View>
             <View style={{marginBottom: 15,
                 padding: 10,
@@ -190,8 +233,7 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
                     multiline
                 />
             </View>
-            
-
+        
             <View style={styles.moodContainer}>
                 {['😞', '😠', '😐', '😊', '😄'].map((emoji, index) => (
                     <TouchableOpacity
@@ -226,8 +268,6 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
                     </TouchableOpacity>
                 ))}
             </View>
-
-
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                 <Text style={styles.saveButtonText}>Save</Text>
             </TouchableOpacity>
@@ -262,6 +302,11 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 20,
         elevation: 10,
+    },
+    Text: {
+        fontFamily: 'Manrope',
+        fontSize: 17,
+        lineHeight: 24,
     },
     dateText: {
         fontSize: 18,

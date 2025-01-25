@@ -17,6 +17,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 function generateCalender(year: number, month: number){
     const firstDay = new Date(year, month, 1).getDay();
@@ -60,7 +62,7 @@ const setEmoteType = (emote: number) => {
 const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
 const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
-    const [userid, setUserid] = useState('ttt');
+    const [userid, setUserid] = useState<string>('');
     const now = new Date().getDate();
     const month = new Date().getMonth();
     const year = new Date().getFullYear();
@@ -77,6 +79,7 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
               const parsedUserInfo = JSON.parse(storedUserInfo);
               setUserInfo(parsedUserInfo);
               setUserid(parsedUserInfo.id); // userInfo에서 id를 설정
+              console.log("User ID: ", parsedUserInfo.id);
           }
       } catch (error) {
           console.error("Error retrieving user info:", error);
@@ -85,7 +88,6 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
 
     
     async function fetchUsers(userId: string) {
-      console.log("Fetching for userId:", userId); // 확인 로그
       try {
           const response = await fetch(`http://10.0.2.2:80/Home`, {
               method: 'POST',
@@ -93,7 +95,7 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
                   'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                  user_id: "Test",
+                  user_id: "Test"
               }),
           });
           const json = await response.json();
@@ -112,6 +114,14 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
         getUserInfo();
         fetchUsers(userid);
     },[])
+
+
+    useFocusEffect(
+        React.useCallback(() => {
+        fetchUsers(userid);
+        }, [userid])
+    );
+  
 
     return (
         < >

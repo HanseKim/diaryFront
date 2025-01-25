@@ -32,79 +32,104 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [diaryData, setDiaryData] = useState<DiaryEntry[]>([]);
   const [filteredResults, setFilteredResults] = useState<DiaryEntry[]>([]);
+  const [user_id, setUser_id] = useState<string>('');
 
   // 서버에서 일기 데이터를 가져오는 함수
-  const fetchDiaryData = async () => {
+  const fetchDiaryData = async (userId: string) => {
     try {
-      const user = await AsyncStorage.getItem('userInfo');
-      if(user){
-        const user_id = JSON.parse(user).id;
-        const response = await axios.get(`http://10.0.2.2:80/api/diary?user_id=${user_id}`);
-        setDiaryData(response.data);
+      const response = await fetch(`http://10.0.2.2:80/search-diary`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setDiaryData(data);
+        setFilteredResults(data); // 초기에는 전체 데이터를 표시
+      } else {
+        console.error('Error fetching diary data:', data);
       }
     } catch (error) {
       console.error('Error fetching diary data:', error);
     }
   };
 
+  useEffect(() => {
+    const getUserInfo = async () => {
+      try {
+        const user = await AsyncStorage.getItem('userInfo');
+        if (user) {
+          const parsedUser = JSON.parse(user);
+          setUser_id(parsedUser.id);
+          fetchDiaryData(parsedUser.id); // user_id가 설정된 후에 요청을 보냅니다.
+        }
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    };
+
+    getUserInfo();
+  }, []);
+
   // 검색 버튼 클릭 시 실행
   const handleSearch = () => {
     const results = diaryData.filter((diary) =>
-        diary.title.toLowerCase().includes(searchQuery.toLowerCase())
+      diary.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredResults(results);
   };
 
-  useEffect(() => {
-    fetchDiaryData();
-  }, []);
-
   // 검색된 아이템 클릭 시 상세 화면으로 이동
   const handleItemPress = (item: DiaryEntry) => {
     navigation.navigate('Detail', {
-      // 년, 월 , 일 넘겨주기
-      id: item.id,
+      clickdate: parseInt(item.diary_date.split('-')[2], 10) , 
+      clickmonth: parseInt(item.diary_date.split('-')[1], 10) - 1,
+      clickyear: parseInt(item.diary_date.split('-')[0], 10), 
+      userid: user_id,
     });
   };
 
   return (
-      <SafeAreaView style={styles.container}>
-        {/* 검색 입력창 */}
-        <View style={styles.searchContainer}>
-          <TextInput
-              style={styles.searchInput}
-              placeholder="검색할 일기의 제목을 입력하세요"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-          />
-          <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-            <Icon name="search" size={24} color="#FFF" />
-          </TouchableOpacity>
-        </View>
+    <SafeAreaView style={styles.container}>
+      {/* 검색 입력창 */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="검색할 일기의 제목을 입력하세요"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+          <Icon name="search" size={24} color="#FFF" />
+        </TouchableOpacity>
+      </View>
 
-        {/* 검색 결과 */}
-        <View style={{ width: "100%", alignItems: 'center' }}>
-          <FlatList
-            data={filteredResults}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-                <TouchableOpacity
-                    style={styles.resultContainer}
-                    onPress={() => handleItemPress(item)}
-                >
-                  <View style={styles.resultContent}>
-                    <Text style={styles.resultMood}>{feelingMap[item.feeling]}</Text>
-                    <View>
-                      <Text style={styles.resultDate}>{item.diary_date}</Text>
-                      <Text style={styles.resultHeadline}>{item.title}</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-            )}
-          />
-        </View>
-        
-      </SafeAreaView>
+      {/* 검색 결과 */}
+      <View style={{ width: "100%", alignItems: 'center' }}>
+        <FlatList
+          data={filteredResults}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.resultContainer}
+              onPress={() => handleItemPress(item)}
+            >
+              <View style={styles.resultContent}>
+                <Text style={styles.resultMood}>{feelingMap[item.feeling]}</Text>
+                <View>
+                  <Text style={styles.resultDate}>{item.diary_date}</Text>
+                  <Text style={styles.resultHeadline}>{item.title}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 

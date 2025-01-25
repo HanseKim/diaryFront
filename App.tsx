@@ -10,6 +10,7 @@ import { initializeNotifications, setupNotificationListeners } from './utils/not
 import { AppProvider } from './contexts/appContext'
 import MessageScreen from './screens/MessageScreen';
 import {WriteDiaryScreen} from './screens/WriteDiaryScreen';
+import EditDiaryScreen from './screens/EditDiaryScreen';
 
 type RootStackParamList = {
   Login: undefined,
@@ -19,6 +20,7 @@ type RootStackParamList = {
   SignUp: undefined,
   Message : undefined,
   WriteDiaryScreen : undefined
+  EditDiaryScreen : undefined
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -39,6 +41,7 @@ function App(): React.JSX.Element {
           <Stack.Screen name="Detail" component={DiaryDetailScreen} />
           <Stack.Screen name="Message" component={MessageScreen} />
           <Stack.Screen name="WriteDiaryScreen" component={WriteDiaryScreen} />
+          <Stack.Screen name="EditDiaryScreen" component={EditDiaryScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </AppProvider>

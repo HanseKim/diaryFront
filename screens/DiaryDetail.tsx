@@ -5,6 +5,7 @@
  * @format
  */
 
+import { useFocusEffect } from '@react-navigation/native';
 import React , {useEffect, useState } from 'react';
 import {
   Image,
@@ -16,7 +17,7 @@ import {
   Modal,
   Pressable,
 } from 'react-native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import EditDiaryScreen from './EditDiaryScreen';
 
 const setEmoteType = (emote: any) => {
   const emoteList = ['😊', '😥', '😡', '😭', '🤣'];
@@ -50,19 +51,56 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
   const nowMonth = new Date().getMonth();
   const emoteToday = setEmoteType(diary?.feeling);
   const monthName = setMonthName(clickmonth);
+  
+  const formatDate = (year: number, month: number, day: number) => {
+    const formattedMonth = (month + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1
+    const formattedDay = day.toString().padStart(2, '0');
+    return `${year}-${formattedMonth}-${formattedDay}`;
+  };
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      const diary_date = formatDate(year, month, date);
+      console.log(diary_date);
+      fetchUsers(userid, diary_date);
+    }, [])
+  );
+  
+  useEffect(() => {
+    const diary_date = formatDate(year, month, date);
+    fetchUsers(userid, diary_date);
+  }, [date]);
+  
 
+  const movebackward = () => {
+    const lastDateOfPrevMonth = new Date(year, month, 0).getDate();
+    if (date == 1) {
+      if (month == 0) {
+        setMonth(11);
+        setYear(year - 1);
+      } else {
+        setMonth(month - 1);
+      }
+      setDate(lastDateOfPrevMonth);
+    } else {
+      setDate(date - 1);
+    }
+  };
 
-  const movebackward = () =>{
-    setDate(date-1);
-    console.log("backward work");
-    //fetchUsers(userid, `${year}-${month+1}-${date}`);
-  }
-
-  const moveforward = () =>{
-    setDate(date+1);
-    console.log("frontward work");
-    //fetchUsers(userid, `${year}-${month+1}-${date}`);
-  }
+  const moveforward = () => {
+    const lastDateOfCurrentMonth = new Date(year, month + 1, 0).getDate();
+    if (date === lastDateOfCurrentMonth) {
+      if (month === 11) {
+        setMonth(0);
+        setYear(year + 1);
+      } else {
+        setMonth(month + 1);
+      }
+      setDate(1);
+    } else {
+      setDate(date + 1);
+    }
+  };
 
   const fetchUsers = async (userId: string, diaryDate: string) => {
     try {
@@ -88,11 +126,9 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
   };
 
   useEffect(() => {
-    fetchUsers(userid, `${year}-${month+1}-${date}`);
+    const diary_date = `${year}-${month+1}-${date}`;
+    fetchUsers(userid, diary_date);
   }, [date]);
-
-  //console.log(`${year}-${month+1}-${date}`);
-  //console.log(diary);
 
   return (
     <View style={styles.container}>
@@ -129,7 +165,7 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
                   <View style={{flexDirection: 'row'}}>
                   <View style={{width:'66%'}}></View>
                     <View style={styles.modal}>
-                    <TouchableOpacity onPress={() => navigation.navigate('Edit')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('EditDiaryScreen', {diaryId: diary?.id } )}>
                       <Text style={styles.Text}>Edit</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => setModalVisible(false)}>
