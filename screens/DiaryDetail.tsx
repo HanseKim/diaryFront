@@ -194,7 +194,7 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
         </View>
           
         <View style={{flexDirection: 'row', height: '70%', width: '90%', alignItems: 'center'}}>
-          <View style={{width: '100%', height: '90%', alignItems: 'center'}}>
+          <View style={{width: '100%', height: '90%'}}>
             {diary == null ? <Text>작성된 일기가 없습니다.</Text>
             : <Text style={styles.Text}>{diary.content}</Text>
             }

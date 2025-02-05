@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Text,
   FlatList,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
@@ -104,7 +105,10 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           onChangeText={setSearchQuery}
         />
         <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-          <Icon name="search" size={24} color="#FFF" />
+          <Image
+            source={require("../images/Search.png")}
+            style={{ width: 24, height: 24 }}
+          />
         </TouchableOpacity>
       </View>
 
@@ -165,7 +169,7 @@ const styles = StyleSheet.create({
   searchButton: {
     backgroundColor: '#F6A5C0',
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },

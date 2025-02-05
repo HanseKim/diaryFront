@@ -52,9 +52,14 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
   const [couple_month, setCoupleMonth] = useState<number>(0);
   const [couple_all, setCoupleAll] = useState<number>(0);
 
-  useEffect(() => {
-    getUserInfo();
-  }, []);
+  useFocusEffect(
+        React.useCallback(() => {
+          getUserInfo();
+        }, [])
+    );
+  // useEffect(() => {
+  //   getUserInfo();
+  // }, []);
 
   useEffect(() => {
     const days = calculateDaysPassed();

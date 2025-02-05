@@ -1,0 +1,61 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+__tests__/
+
+# React Native
+*.expo/
+*.pack
+*.hbc
+.haul/
+.expo-shared/
+
+# Metro bundler
+index.android.bundle
+index.ios.bundle
+index.*.bundle
+
+# Android
+android/
+android/.gradle/
+android/app/build/
+android/build/
+*.keystore
+local.properties
+android/app/google-services.json
+
+# iOS
+ios/
+ios/Pods/
+ios/build/
+ios/DerivedData/
+*.xcworkspace
+*.xcuserstate
+*.xcuserdata
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+
+# IDE/Editor files
+.idea/
+*.iml
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+*.log
+
+# Debug and Release Files
+*.apk
+*.aab
+*.dSYM
+*.app
+
+# Environment Files
+.env
+.env.*
+
+vendor/
+node_modules
