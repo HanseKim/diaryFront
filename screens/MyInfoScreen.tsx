@@ -53,10 +53,10 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
   const [couple_all, setCoupleAll] = useState<number>(0);
 
   useFocusEffect(
-        React.useCallback(() => {
-          getUserInfo();
-        }, [])
-    );
+      React.useCallback(() => {
+        getUserInfo();
+      }, [])
+  );
   // useEffect(() => {
   //   getUserInfo();
   // }, []);

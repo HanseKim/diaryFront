@@ -103,9 +103,6 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.backgroundContainer}>
-        {/* <View style={{
-          width: '100%',
-          height: '60%',}}></View> */}
         <Image
           source={require('../images/bg_pinkwave.png')}
           style={styles.backgroundImage}

@@ -1,8 +1,9 @@
-import React,{useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Image,
-  StyleSheet
+  StyleSheet,
+  ScrollView
 } from 'react-native';
 import RegisterInputScreen from '../components/RegisterInputScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,9 +18,7 @@ const RegisterScreen: React.FC<{ route: any, navigation: any }> = ({ route, navi
         },
         body: JSON.stringify({ nickname, id, password }),
       });
-
       const data = await response.json();
-      
       if (data.success) {
         console.log("Registration successful!");
         navigation.reset({
@@ -33,24 +32,34 @@ const RegisterScreen: React.FC<{ route: any, navigation: any }> = ({ route, navi
       console.error("Error during registration:", error);
     }
   };
+
   const goLogin = () => {
     navigation.reset({
-      index: 0, 
-      routes: [{ name: 'Login' }], 
+      index: 0,
+      routes: [{ name: 'Login' }],
     });
   }
 
   return (
-    <View style={[styles.container]}>
-        <Image 
-            source={require('../images/bg_pinkwave.png')} 
-            style={styles.backgroundImage} 
-        />
-        <Image source={require('../images/logo.png')} style={styles.logo} />
-        <RegisterInputScreen 
-            handleRegister={handleRegister} 
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.backgroundContainer}>
+          <Image
+            source={require('../images/bg_pinkwave.png')}
+            style={styles.backgroundImage}
+          />
+        </View>
+        <View style={styles.contentContainer}>
+          <Image source={require('../images/logo.png')} style={styles.logo} />
+          <RegisterInputScreen
+            handleRegister={handleRegister}
             goLogin={goLogin}
-            style={styles.loginInput}/>
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -59,27 +68,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
+  },
+  backgroundContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   backgroundImage: {
-    position: 'absolute',
-    bottom: 0,
     width: '100%',
-    height: 250,
-    zIndex: 0,
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+  },
+  contentContainer: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
   },
   logo: {
-    zIndex: 1,
     width: 400,
-    height: 300
-  },
-  loginInput: {
-    zIndex: 2,
-    width: 400,
-    height: 470,
-    alignItems: 'center',  // 가운데 정렬
-    justifyContent: 'space-between'
-  },
+    height: "40%",
+  }
 });
 
 export default RegisterScreen;
