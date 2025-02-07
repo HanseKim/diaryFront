@@ -6,12 +6,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  FlatList,
+  FlatList,  // ScrollView 제거하고 FlatList만 사용
   Image,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface DiaryEntry {
   id: string;
@@ -87,12 +86,18 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   // 검색된 아이템 클릭 시 상세 화면으로 이동
   const handleItemPress = (item: DiaryEntry) => {
     navigation.navigate('Detail', {
-      clickdate: parseInt(item.diary_date.split('-')[2], 10) , 
+      clickdate: parseInt(item.diary_date.split('-')[2], 10),
       clickmonth: parseInt(item.diary_date.split('-')[1], 10) - 1,
-      clickyear: parseInt(item.diary_date.split('-')[0], 10), 
+      clickyear: parseInt(item.diary_date.split('-')[0], 10),
       userid: user_id,
     });
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchDiaryData(user_id);
+    }, [user_id])
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -106,33 +111,32 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         />
         <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
           <Image
-            source={require("../images/Search.png")}
+            source={require('../images/Search.png')}
             style={{ width: 24, height: 24 }}
           />
         </TouchableOpacity>
       </View>
 
       {/* 검색 결과 */}
-      <View style={{ width: "100%", alignItems: 'center' }}>
-        <FlatList
-          data={filteredResults}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.resultContainer}
-              onPress={() => handleItemPress(item)}
-            >
-              <View style={styles.resultContent}>
-                <Text style={styles.resultMood}>{feelingMap[item.feeling]}</Text>
-                <View>
-                  <Text style={styles.resultDate}>{item.diary_date}</Text>
-                  <Text style={styles.resultHeadline}>{item.title}</Text>
-                </View>
+      <FlatList
+        style={{width:"100%"}}
+        data={filteredResults}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.resultContainer}
+            onPress={() => handleItemPress(item)}
+          >
+            <View style={styles.resultContent}>
+              <Text style={styles.resultMood}>{feelingMap[item.feeling]}</Text>
+              <View>
+                <Text style={styles.resultDate}>{item.diary_date}</Text>
+                <Text style={styles.resultHeadline}>{item.title}</Text>
               </View>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
     </SafeAreaView>
   );
 };
@@ -145,7 +149,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   searchContainer: {
-    width: 350,
+    width: "100%",
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFF',
@@ -174,9 +178,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   resultContainer: {
-    width: 350,
+    width: "100%",
+    alignItems: 'center'
+  },
+  resultContent: {
+    width: '95%',
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#FFF',
     padding: 15,
+    marginTop: 5,
     marginBottom: 15,
     borderRadius: 20,
     shadowColor: '#FF5C85',
@@ -187,10 +198,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 10,
     elevation: 8,
-  },
-  resultContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   resultMood: {
     fontSize: 24,

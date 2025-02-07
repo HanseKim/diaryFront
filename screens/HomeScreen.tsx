@@ -73,55 +73,59 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
     const [userInfo, setUserInfo] = useState<any>(null); // 사용자 정보 상태 추가
 
     const getUserInfo = async () => {
-    try { 
-          const storedUserInfo = await AsyncStorage.getItem("userInfo");
-          if (storedUserInfo) {
-              const parsedUserInfo = JSON.parse(storedUserInfo);
-              setUserInfo(parsedUserInfo);
-              setUserid(parsedUserInfo.id); // userInfo에서 id를 설정
-              console.log("User ID: ", parsedUserInfo.id);
-          }
-      } catch (error) {
-          console.error("Error retrieving user info:", error);
-      }
+        try { 
+            const storedUserInfo = await AsyncStorage.getItem("userInfo");
+            if (storedUserInfo) {
+                const parsedUserInfo = JSON.parse(storedUserInfo);
+                setUserInfo(parsedUserInfo);
+                setUserid(parsedUserInfo.id); // userInfo에서 id를 설정
+                console.log("User ID: ", parsedUserInfo.id);
+            }
+        } catch (error) {
+            console.error("Error retrieving user info:", error);
+        }
     };
 
     
-    async function fetchUsers(userId: string) {
-      try {
-          const response = await fetch(`http://10.0.2.2:80/Home`, {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                  user_id: "Test"
-              }),
-          });
-          const json = await response.json();
-          if (json.success) {
-              console.log("Diary data received:", json.data); // 데이터 확인
-              setsmallDiary(json.data);
-          } else {
-              console.error('API error:', json);
-              setsmallDiary([]);
-          }
-      } catch (error) {
-          console.error('Fetch error:', error);
-      }
-  }  
+    async function fetchUsers() {
+        try {
+            const storedUserInfo = await AsyncStorage.getItem("userInfo");
+            if (storedUserInfo) {
+                const parsedUserInfo = JSON.parse(storedUserInfo);
+                setUserid(parsedUserInfo.id); // userInfo에서 id를 설정
+            }
+            const response = await fetch(`http://10.0.2.2:80/Home`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userid
+                }),
+            });
+            const json = await response.json();
+            if (json.success) {
+                console.log("Diary data received:", json.data); // 데이터 확인
+                setsmallDiary(json.data);
+            } else {
+                console.error('API error:', json);
+                setsmallDiary([]);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    }  
     useEffect(() => {
         getUserInfo();
-        fetchUsers(userid);
-    },[])
-
-
+    }, []); // 처음 한 번만 실행
+    
     useFocusEffect(
         React.useCallback(() => {
-        fetchUsers(userid);
-        }, [userid])
+            if (userid) {  // userid가 있을 때만 실행
+                fetchUsers();
+            }
+        }, [userid]) // userid 변경 시에만 실행
     );
-  
 
     return (
         < >
