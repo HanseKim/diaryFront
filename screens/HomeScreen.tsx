@@ -56,22 +56,29 @@ const setMonthName = (month: number) => {
 }
 
 const setEmoteType = (emote: number) => {
-    const emoteList = ['😊', '😥', '😡', '😭', '🤣'];
+    const emoteList = ['😞', '😠', '😐', '😊', '😄'];
     return emoteList[emote-1];
 }
 const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
 const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
     const [userid, setUserid] = useState<string>('');
-    const now = new Date().getDate();
-    const month = new Date().getMonth();
-    const year = new Date().getFullYear();
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const actualToday = new Date()
+    const month = currentDate.getMonth();
+    const year = currentDate.getFullYear();
     const [smalldiary, setsmallDiary] = useState<any[]>([]);
     
     const calendarMatrix = generateCalender(year, month);
     const monthName = setMonthName(month);
     const [userInfo, setUserInfo] = useState<any>(null); // 사용자 정보 상태 추가
 
+    const goToPreviousMonth = () => {
+        setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)));
+    };
+    const goToNextMonth = () => {
+        setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)));
+    };
     const getUserInfo = async () => {
         try { 
             const storedUserInfo = await AsyncStorage.getItem("userInfo");
@@ -85,8 +92,6 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
             console.error("Error retrieving user info:", error);
         }
     };
-
-    
     async function fetchUsers() {
         try {
             const storedUserInfo = await AsyncStorage.getItem("userInfo");
@@ -128,80 +133,93 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
     );
 
     return (
-        < >
         <View style={{ flex: 1, alignItems: 'center', backgroundColor: 'white'}}>
             <Image source={require('../images/logo.png')} style={{ width: '100%', height: '10%' }} />
-        
-        <View style={{ paddingTop:'3%', width: '100%', alignItems: 'center', backgroundColor: '#FADFEC', marginTop: '5%', borderRadius: 10, shadowOffset: { width: 0, height: 2 }, shadowColor: '#F5BFD9', shadowOpacity: 0.5, shadowRadius: 2 }}>
-            <View style={styles.headerContainer}>
-                <Text style={styles.headerText}>{monthName} {year}</Text>
-            </View>
+            <View style={{ paddingTop:'3%', width: '100%', alignItems: 'center', backgroundColor: '#FADFEC', marginTop: '5%', borderRadius: 10, shadowOffset: { width: 0, height: 2 }, shadowColor: '#F5BFD9', shadowOpacity: 0.5, shadowRadius: 2 }}>
+                <View style={styles.headerContainer}>
+                    <TouchableOpacity onPress={goToPreviousMonth} style={{}}>
+                        <Text style={{}}>◀</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.headerText}>{monthName} {year}</Text>
+                    <TouchableOpacity onPress={goToNextMonth} style={{}}>
+                        <Text style={{}}>▶</Text>
+                    </TouchableOpacity>
+                </View>
 
-            <View style={{width: '100%', height: '5%', flexDirection: 'row', justifyContent: 'center'}}>
-                {weekdays.map((day, idx) => {
-                    const backgroundColor = idx === 0 ? '#FF6161' : idx === 6 ? '#718FF3' : '#333';
-                    return (
-                        <View key={idx} style={[styles.weekdayBox, { backgroundColor }]}>
-                            <Text style={styles.weekdayText}>{day}</Text>
-                        </View>
-                    );
-                })}
-            </View>
-
-            {calendarMatrix.map((week, rowIndex) => (
-                <View style={styles.row} key={rowIndex}>
-                    {week.map((date, colIndex) => {
-                        const textColor = colIndex === 0 ? '#FF6161' : colIndex === 6 ? '#718FF3' : 'black';
-                        
-                        const borderColor = date === now ? '#F5BFD9' : 'white';
-                        let matchedDiary = smalldiary?.find((item: { diary_date: string | number | Date; }) => {
-                            const d = new Date(item.diary_date);
-                            return (
-                              d.getFullYear() === year &&
-                              d.getMonth() === month &&
-                              d.getDate() === date
-                            );
-                          });
-                          const emoteToday = setEmoteType(matchedDiary?.feeling);
+                <View style={{width: '100%', height: '5%', flexDirection: 'row', justifyContent: 'center'}}>
+                    {weekdays.map((day, idx) => {
+                        const backgroundColor = idx === 0 ? '#FF6161' : idx === 6 ? '#718FF3' : '#333';
                         return (
-                            <TouchableOpacity onPress={() => navigation.navigate('Detail', {clickdate: date, clickmonth: month, clickyear: year, userid : userid})} 
-                            style={[styles.dateBox, {borderColor: borderColor, borderWidth: 4}]} key={colIndex}>
-                                {date ? (
-                                    <>
-                                    <Text style={[styles.dateText, { color: textColor}]}>
-                                    {date}
-                                    </Text>
-                                    {matchedDiary ? (
-                                        <>
-                                        <Text>
-                                            {emoteToday}
-                                        </Text>
-                                        <Text>
-                                            {matchedDiary?.title}
-                                        </Text></>
-                                    ) : (
-                                        <Text> </Text>
-                                    )}
-                                    </>
-                                ) : (
-                                    <Text style={styles.dateText}> </Text>
-                                )}
-                            </TouchableOpacity>
+                            <View key={idx} style={[styles.weekdayBox, { backgroundColor }]}>
+                                <Text style={styles.weekdayText}>{day}</Text>
+                            </View>
                         );
                     })}
                 </View>
-            ))}
+
+                {calendarMatrix.map((week, rowIndex) => (
+                    <View style={styles.row} key={rowIndex}>
+                        {week.map((date, colIndex) => {
+                            const textColor = colIndex === 0 ? '#FF6161' : colIndex === 6 ? '#718FF3' : 'black';
+                            
+                            const borderColor = (
+                                date === actualToday.getDate() && 
+                                month === actualToday.getMonth() && 
+                                year === actualToday.getFullYear()
+                            ) ? '#F5BFD9' : 'white';
+                
+                            let matchedDiary = smalldiary?.find((item: { diary_date: string | number | Date; }) => {
+                                const d = new Date(item.diary_date);
+                                return (
+                                d.getFullYear() === year &&
+                                d.getMonth() === month &&
+                                d.getDate() === date
+                                );
+                            });
+                            const emoteToday = setEmoteType(matchedDiary?.feeling);
+                            return (
+                                <TouchableOpacity onPress={() => navigation.navigate('Detail', {clickdate: date, clickmonth: month, clickyear: year, userid : userid})} 
+                                style={[styles.dateBox, {borderColor: borderColor, borderWidth: 4}]} key={colIndex}>
+                                    {date ? (
+                                        <>
+                                        <Text style={[styles.dateText, { color: textColor}]}>
+                                        {date}
+                                        </Text>
+                                        {matchedDiary ? (
+                                            <>
+                                            <Text>
+                                                {emoteToday}
+                                            </Text>
+                                             <Text 
+                                                numberOfLines={2}
+                                                ellipsizeMode="tail"
+                                                style={{}}
+                                            >
+                                                {matchedDiary?.title}
+                                            </Text></>
+                                        ) : (
+                                            <Text> </Text>
+                                        )}
+                                        </>
+                                    ) : (
+                                        <Text style={styles.dateText}> </Text>
+                                    )}
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                ))}
+            </View>
         </View>
-        </View>
-        </>
       );
 };
 
 const styles = StyleSheet.create({
     headerContainer: {
-        justifyContent: 'center',
+        justifyContent: 'space-around',
         alignItems: 'center',
         textAlign: 'center',
+        flexDirection: 'row',
         marginBottom: 16,
         backgroundColor: '#FADFEC',
         width: '98%',

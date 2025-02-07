@@ -8,7 +8,7 @@ import {
     StyleSheet,
     Alert
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 57,
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-around',
         alignItems: 'center',
         paddingHorizontal: 10,
         marginBottom: 20,
@@ -358,13 +358,6 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 8,
         fontSize: 16,
-        marginBottom: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 3,
-        borderBottomColor: 'lightgray',
         borderBottomWidth: 1,
     },
     inputContent: {
@@ -372,13 +365,10 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 8,
         fontSize: 16,
-        minHeight: 150,
+        minHeight: 300,
         textAlignVertical: 'top',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
+        borderTopWidth : 1,
+        borderTopColor: 'gray',
         marginBottom: 16,
     },
     moodContainer: {

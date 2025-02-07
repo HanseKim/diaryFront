@@ -16,11 +16,12 @@ import {
   StyleSheet,
   Modal,
   Pressable,
+  ScrollView,
 } from 'react-native';
 import EditDiaryScreen from './EditDiaryScreen';
 
 const setEmoteType = (emote: any) => {
-  const emoteList = ['😊', '😥', '😡', '😭', '🤣'];
+  const emoteList = ['😞', '😠', '😐', '😊', '😄'];
 
   return emoteList[emote-1];
 }
@@ -145,60 +146,51 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
       </View>
 
       <View style={[styles.cardContainer, { height : '80%'}]}>
-        <View style={{flexDirection: 'row', width: '100%', height: '10%'}}>
-          <Text style={{width:'20%',height:'100%', textAlign: 'center', fontSize: 30 }}>{emoteToday}
-          </Text>
-          <TouchableOpacity onPress={() => setModalVisible(true)} style={{width:'70%', height: '100%', alignItems: 'center'}}>
-            <Text style={{fontSize: 30, width: '100%', textAlign: 'right'}}>{'\u22EE'}</Text>
-          </TouchableOpacity>
-          <Pressable onPress={() => setModalVisible(false)} style={{width:'100%', height:'100%'}}>
-            <View style={{width:'100%', height:'100%'}}>
-              <Modal
-                animationType="none"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                  setModalVisible(false);
-                  }}
-                >
-                  <View style={{width:'100%', height: '23%'}}></View>
-                  <View style={{flexDirection: 'row'}}>
-                  <View style={{width:'66%'}}></View>
-                    <View style={styles.modal}>
-                    <TouchableOpacity onPress={() => navigation.navigate('EditDiaryScreen', {diaryId: diary?.id } )}>
-                      <Text style={styles.Text}>Edit</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setModalVisible(false)}>
-                      <Text style={styles.Text}>Close</Text>
-                    </TouchableOpacity>
-                    </View>
-                    </View>
-              </Modal>
-            </View>
-          </Pressable>
-        </View>
 
-        <View style={{flexDirection: 'row', width: '100%', height: '5%'}}>
-          <View style={styles.highlightBox}>
-            <Text style={[styles.Text, {textAlign: 'center'}]}>
-              🕗 {monthName} {date}</Text>
+        <View style={{width: '100%', height: '12%'}}>
+          <View style={{flexDirection:'row', width: '100%', height: '50%', marginTop:20, justifyContent:'space-between'}}>
+            <Text style={{width: '20%',height:'100%', textAlign: 'center', fontSize: 30}}>{emoteToday}</Text>
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('EditDiaryScreen', {diaryId: diary?.id } )} 
+              style={{
+                width:'17%',
+                height: '100%', 
+                marginRight: 30,
+                alignItems: 'flex-end', 
+                justifyContent: 'center'
+              }}>
+              <Text style={{fontSize: 16, width: '100%', textAlign: 'right'}}>edit</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{height:'40%', marginTop:'5%'}}>
+            <View style={[styles.highlightBox, {marginLeft: 10}]}>
+              <Text style={[{textAlignVertical:'center'},styles.Text]}>
+                🕗 {monthName} {date}</Text>
+            </View>
           </View>
         </View>
 
-        <View style={{flexDirection: 'row', width: '100%', height: '10%', marginTop: "5%",marginBottom: '5%'}}>
-          <View style={{width: '70%', height: '100%', margin: '5%'}}>
+        <View style={{flexDirection: 'row', width: '100%', height: '10%', marginTop: "10%",marginBottom: '5%'}}>
+          <View style={{width: '90%', height: '100%', margin: '5%'}}>
             {diary == null ? <Text></Text>
-            : <Text style={styles.titleText}>{diary.title}</Text>
+            : <Text 
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={styles.titleText}
+              >
+                {diary.title}
+              </Text>
             }
           </View>
         </View>
           
-        <View style={{flexDirection: 'row', height: '70%', width: '90%', alignItems: 'center'}}>
-          <View style={{width: '100%', height: '90%'}}>
-            {diary == null ? <Text>작성된 일기가 없습니다.</Text>
-            : <Text style={styles.Text}>{diary.content}</Text>
+        <View style={styles.contentContainer}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            {diary == null ? 
+              <Text>작성된 일기가 없습니다.</Text>
+              : <Text style={styles.Text}>{diary.content}</Text>
             }
-          </View>
+          </ScrollView>
         </View>
       </View>
     </View>
@@ -242,7 +234,6 @@ const styles = StyleSheet.create({
   Text: {
     fontFamily: 'Manrope',
     fontSize: 17,
-    lineHeight: 24,
   },
   row: {
     flexDirection: 'row',
@@ -254,11 +245,11 @@ const styles = StyleSheet.create({
   },
   highlightBox: {
     backgroundColor: '#F5BFD9',
+    flexDirection: 'row',
     borderRadius: 10,
     width: '40%',
     height: '100%',
     padding: '1%',
-    margin: '3%',
   },
   logoImage: {
     width: 100,
@@ -268,6 +259,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 40,
     fontFamily: 'Manrope',
+    overflow: 'hidden',
   },
   modal: {
     width: '20%',
@@ -276,7 +268,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: 'black',
     borderWidth: 5,
-  }
+  },
+  contentContainer: {
+    flexDirection: 'row',
+    height: '70%',
+    width: '90%',
+    marginTop: 20,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    width: '100%',
+  },
 });
 
 export default DiaryDetailScreen;

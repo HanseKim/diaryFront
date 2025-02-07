@@ -48,8 +48,11 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       });
       const data = await response.json();
       if (response.ok) {
-        setDiaryData(data);
-        setFilteredResults(data); // 초기에는 전체 데이터를 표시
+        const sortedData = data.sort((a: DiaryEntry, b: DiaryEntry) => 
+          new Date(b.diary_date).getTime() - new Date(a.diary_date).getTime()
+        );
+        setDiaryData(sortedData);
+        setFilteredResults(sortedData); 
       } else {
         console.error('Error fetching diary data:', data);
       }
