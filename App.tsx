@@ -6,11 +6,12 @@ import MainTabNavigator from './navigators/MainTabNavigator';
 import DiaryDetailScreen from './screens/DiaryDetail';
 import SignUpScreen from './screens/SignUpScreen';
 import RegisterScreen from './screens/RegisterScreen';
-import { initializeNotifications, setupNotificationListeners } from './utils/notification';
+import { initializeNotifications } from './utils/notification';
 import { AppProvider } from './contexts/appContext'
 import MessageScreen from './screens/MessageScreen';
 import {WriteDiaryScreen} from './screens/WriteDiaryScreen';
 import EditDiaryScreen from './screens/EditDiaryScreen';
+import { setupForegroundNotificationListener } from './utils/notification';
 
 type RootStackParamList = {
   Login: undefined,
@@ -28,6 +29,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 function App(): React.JSX.Element {
   useEffect(() => {
     initializeNotifications();
+    setupForegroundNotificationListener();
   }, []);
 
   return (

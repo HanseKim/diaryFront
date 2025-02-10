@@ -4,8 +4,8 @@ import {
   Image,
   StyleSheet,
   Alert,
-  KeyboardAvoidingView, 
-  Platform, 
+  KeyboardAvoidingView,
+  Platform,
   ScrollView
 } from 'react-native';
 import LoginInputScreen from '../components/LoginInputScreen';
@@ -20,7 +20,7 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
   async function getFCMToken() {
     try {
       const authStatus = await messaging().requestPermission();
-      const enabled = 
+      const enabled =
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
@@ -36,30 +36,64 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
 
   // 자동 로그인 체크
   const checkAutoLogin = async () => {
+    console.log("자동 로그인 중");
+    const uid = await AsyncStorage.getItem("userid");
+    const upwd = await AsyncStorage.getItem("userpwd");
     try {
-      const savedToken = await AsyncStorage.getItem('jwtToken');
-      console.log("checkAutoLogin, savedToken: ", savedToken);
-      if (!savedToken) return;
+      if (uid != null && upwd != null) {
+        const loginResult = await login(uid, upwd);
+        console.log("Login API Result:", loginResult);
 
-      const response = await fetch('http://10.0.2.2:80/verify-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${savedToken}`
-        },
-        body: JSON.stringify({
-          token: savedToken,
-        }),
-      });
+        // loginResult와 token이 있는지 확인
+        // 로그인 성공 여부 체크
+        if (!loginResult) {
+          await AsyncStorage.multiRemove(['jwtToken', 'userid', 'userpwd']);
+          throw new Error('Login response is invalid');
+        }
+        else {
+          /*
+          const fcmToken = await getFCMToken();
 
-      const result = await response.json();
-      console.log('Verify Token Response:', result);
+          // FCM 토큰 서버 저장
+          if (fcmToken) {
+            const url = 'http://10.0.2.2:80/save-fcm-token';
+            await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                token: fcmToken
+              }),
+            });
+          }
+            */
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Main' }],
+          });
+        }
+      }
+    }
+    catch (error) {
 
-      if (response.ok) {
-        const  user  = result.user; // 사용자 정보 받아오기
+    }
+  };
 
-        // 사용자 정보 저장
-        await AsyncStorage.setItem('userInfo', JSON.stringify(user));
+
+
+  // 로그인 처리 함수
+  const handleLogin = async (id: string, password: string) => {
+    try {
+      const loginResult = await login(id, password);
+      console.log("Login API Result:", loginResult);
+
+      // loginResult와 token이 있는지 확인
+      // 로그인 성공 여부 체크
+      if (!loginResult) {
+        throw new Error('Login response is invalid');
+      }
+      else {
 
         const fcmToken = await getFCMToken();
 
@@ -70,62 +104,17 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${savedToken}`
             },
-            body: JSON.stringify({ token: fcmToken }),
+            body: JSON.stringify({
+              token: fcmToken
+            }),
           });
         }
-
         navigation.reset({
           index: 0,
           routes: [{ name: 'Main' }],
         });
-      } else {
-        // 토큰이 유효하지 않으면 삭제
-        await AsyncStorage.multiRemove(['jwtToken', 'userInfo']);
       }
-    } catch (error) {
-      console.error("Auto login error:", error);
-    }
-  };
-
-  
-
-  // 로그인 처리 함수
-  const handleLogin = async (id: string, password: string) => {
-    try {
-      const loginResult = await login(id, password);
-      console.log("Login API Result:", loginResult);
-
-      // loginResult와 token이 있는지 확인
-      if (!loginResult) {
-        throw new Error('Login response is invalid');
-      }
-  
-      const fcmToken = await getFCMToken();
-  
-      // 로그인 성공 시 토큰과 사용자 ID 저장
-      await AsyncStorage.setItem('userId', id);
-  
-      // FCM 토큰 서버 저장
-      if (fcmToken) {
-        const url = 'http://10.0.2.2:80/save-fcm-token';
-        await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${fcmToken}` // Authorization 헤더 추가
-          },
-          body: JSON.stringify({
-            token: fcmToken
-          }),
-        });
-      }
-  
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Main' }],
-      });
     } catch (error: any) {
       console.error("Login failed:", error);
       if (error.status === 401) {
@@ -151,7 +140,7 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
 
   return (
     <View style={styles.container}>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
@@ -181,7 +170,7 @@ const styles = StyleSheet.create({
   backgroundContainer: {
     position: 'absolute',
     top: 0,
-    left:0,
+    left: 0,
     right: 0,
     bottom: 0,
   },

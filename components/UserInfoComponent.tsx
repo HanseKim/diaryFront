@@ -7,7 +7,6 @@ import {
   View,
   Image,
 } from 'react-native';
-import { InterfaceOrientation } from "react-native-reanimated";
 
 type InfoComponentProps = {
   name : string

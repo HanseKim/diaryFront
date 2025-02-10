@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import { useFocusEffect } from '@react-navigation/native';
+import { fetchGroupId } from '../utils/apiClient';
 
 
 function generateCalender(year: number, month: number){

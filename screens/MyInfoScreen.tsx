@@ -15,7 +15,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import UserInfoComponent from '../components/UserInfoComponent';
 import CoupleInfoComponent from '../components/CoupleInfoComponent';
 import UserModal from '../components/UserModal';
-import CoupleModal from '../components/CoupleModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '../utils/apiClient';
 import * as Animatable from 'react-native-animatable';
@@ -51,78 +50,50 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
   const [coupleName, setCoupleName] = useState<string>("");
   const [couple_month, setCoupleMonth] = useState<number>(0);
   const [couple_all, setCoupleAll] = useState<number>(0);
-
-  useFocusEffect(
-      React.useCallback(() => {
-        getUserInfo();
-      }, [])
-  );
-  // useEffect(() => {
-  //   getUserInfo();
-  // }, []);
-
+  
   useEffect(() => {
-    const days = calculateDaysPassed();
-    setDaysPassed(days+1);
-    
-    if(userInfo && userInfo.coupleName) {
-      setCoupleName(userInfo.coupleName)
+    if (userInfo) {
+      const days = calculateDaysPassed();
+      setDaysPassed(days+1);
+      setCoupleName(userInfo.coupleName || "");
+      setCoupleMonth(userInfo.couple_month || 0);
+      setCoupleAll(userInfo.couple_all || 0);
     }
-    if(userInfo && userInfo.couple_month && userInfo.couple_all) {
-      setCoupleMonth(userInfo.couple_month)
-      setCoupleAll(userInfo.couple_all)
-    }
-  }, [userInfo]); // userInfo가 변경될 때마다 실행
+  }, [userInfo?.date, userInfo?.coupleName, userInfo?.couple_month, userInfo?.couple_all]); // 더 구체적인 의존성
 
   // 사용자 정보를 업데이트하고 데이터베이스에 저장
-  const updateUserInfo = async (newDate: string, options: any) => {
-    const updatedUserInfo = { 
-      ...userInfo, 
-      date: newDate, 
-      options: options, 
-    }; 
-    setUserInfo(updatedUserInfo);
-
+  const updateUserInfo = async (newDate: string, coupleName: any) => {
     try {
-      await apiClient.post("/userprofile", {
-        id: updatedUserInfo.id, 
-        date: newDate,
-        options: options,
-      });
-      await AsyncStorage.setItem("userInfo", JSON.stringify(updatedUserInfo)); // AsyncStorage에 저장
-    } catch (error) {
-      console.error("Error updating user info in database:", error);
-    }
-  };
-
-  // 사용자 정보를 업데이트하고 데이터베이스에 저장
-  const updateCoupletInfo = async (id: string, coupleName: string) => {
-    try {
-      const response = await apiClient.post("/coupleprofile", {
+      const response = await apiClient.post("/userprofile", {
         nickname: userInfo.nickname,
-        id,
-        coupleName,
+        id: userInfo.id, 
+        date: newDate,
+        coupleName: coupleName,
         month_diary: userInfo.month_diary,
         all_diary: userInfo.all_diary
       });
-
+  
       if (response.data.success) {
-        const updatedCoupleInfo = {
+        // 모든 필요한 필드를 포함하여 상태 업데이트
+        const updatedUserInfo = {
           ...userInfo,
+          date: newDate,  // 새로운 날짜 추가
           coupleName: response.data.coupleName,
-          couple_month_diary: response.data.month_diary,
-          couple_all_diary: response.data.all_diary,
+          couple_month_diary: userInfo.couple_month,
+          couple_all_diary: userInfo.couple_all,
         };
-        setUserInfo(updatedCoupleInfo);
-        await AsyncStorage.setItem("userInfo", JSON.stringify(updatedCoupleInfo));
-        console.log(
-          "Couple Info Updated:",
-          updatedCoupleInfo.coupleName,
-          updatedCoupleInfo.couple_month_diary,
-          updatedCoupleInfo.couple_all_diary
-        );
-        setCoupleMonth(updatedCoupleInfo.couple_month_diary);
-        setCoupleAll(updatedCoupleInfo.couple_all_diary);
+  
+        // 모든 관련 상태 동시에 업데이트
+        setUserInfo(updatedUserInfo);
+        setCoupleName(response.data.coupleName);
+        setCoupleMonth(userInfo.couple_month);
+        setCoupleAll(userInfo.couple_all);
+        setDaysPassed(calculateDaysPassed()+1); // 날짜 재계산
+  
+        // AsyncStorage 업데이트
+        await AsyncStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
+        
+        console.log("Updated UserInfo:", updatedUserInfo);
       } else {
         console.error("Error:", response.data.message);
       }
@@ -153,24 +124,44 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
       console.error("Error updating couple info:", error);
     }
   };
-  
+
   const renderModal = () => {
     switch(modal) {
       case 0:
         return <></>;
       case 1: 
         return <UserModal handlemodal={handleModal} updateUserInfo={updateUserInfo}/>;
-      case 2: 
-        return <CoupleModal handlemodal={handleModal} updateCoupleInfo={updateCoupletInfo}  userid={userInfo.id}/>;
       default:
         return <></>;
     }
+  }
+  const renderCouple = () => {
+    if(coupleName != ""){
+      return (
+      <Animatable.View
+        animation={animateUser ? 'fadeInUp' : undefined}
+        duration={800}       // 애니메이션 지속 시간
+        delay={500}          // 애니메이션 딜레이 (ms)
+        style={{ marginBottom: 20 }}
+      >
+        <CoupleInfoComponent 
+          name={coupleName}
+          handleModal={handleModal} 
+          couple_month={couple_month || 0}
+          couple_all={couple_all || 0}
+          diarycount = {userInfo ? userInfo.coupleCounts || 0 : 0}
+          daysPassed={daysPassed}
+        />
+      </Animatable.View>)
+    }
+    else return <></>;
   }
 
   useFocusEffect(
     React.useCallback(() => {
       // 페이지에 들어올 때 애니메이션 트리거
       setAnimateUser(true);
+      getUserInfo();
 
       // 애니메이션 종료 시 상태 초기화
       const resetAnimations = setTimeout(() => {
@@ -199,21 +190,7 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
           daysPassed={daysPassed}
         />
       </Animatable.View>
-      <Animatable.View
-        animation={animateUser ? 'fadeInUp' : undefined}
-        duration={800}       // 애니메이션 지속 시간
-        delay={500}          // 애니메이션 딜레이 (ms)
-        style={{ marginBottom: 20 }}
-      >
-        <CoupleInfoComponent 
-          name={coupleName || "???"}
-          handleModal={handleModal} 
-          couple_month={couple_month || 0}
-          couple_all={couple_all || 0}
-          diarycount = {userInfo ? userInfo.coupleCounts || 0 : 0}
-          daysPassed={daysPassed}
-        />
-      </Animatable.View>
+      {renderCouple()}
     </View>
   );
 };

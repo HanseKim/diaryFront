@@ -12,29 +12,11 @@ import RadioGroup, {RadioButtonProps} from 'react-native-radio-buttons-group';
 
 type UserModalProps={
     handlemodal: (modal:number) => void
-    updateUserInfo: (newDate: string, options: string) => void
+    updateUserInfo: (newDate: string, coupleName: string) => void
 }
 const UserModal:React.FC<UserModalProps> = ({handlemodal, updateUserInfo}) => {
-    const radioButtons: RadioButtonProps[] = useMemo(() => ([
-        {
-            id: '1',
-            label: '100일 단위',
-            value: 'option1'
-        },
-        {
-            id: '2',
-            label: '1년 단위',
-            value: 'option2'
-        }
-    ]), []);
-    
+    const [coupleName, setCoupleName] = useState<string>("");
     const [date, updateDate] = useState<string>("");
-    const [options, setOptions] = useState<string>("100일 단위"); // 기본값 설정
-
-    const handleRadioSelect = (selectedId: string | undefined) => {
-        if (selectedId === "1") setOptions("100일 단위");
-        if (selectedId === "2") setOptions("1년 단위");
-    };
     
     const validateDate = (dateString: string) => {
         const regex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD 형식
@@ -46,12 +28,8 @@ const UserModal:React.FC<UserModalProps> = ({handlemodal, updateUserInfo}) => {
             console.log("날짜 입력 제대로");
             return;
         }
-        if (!options) {
-            console.log("options 입력 제대로");
-            return;
-        }
-
-        updateUserInfo(date, options); // updateUserInfo 호출
+        
+        updateUserInfo(date, coupleName); // updateUserInfo 호출
         handlemodal(0); // 모달 닫기
     };
 
@@ -67,27 +45,27 @@ const UserModal:React.FC<UserModalProps> = ({handlemodal, updateUserInfo}) => {
                     onStartShouldSetResponder={() => true}
                 >
                     <Text style={styles.modaltitle}>프로필 수정하기</Text>
-                    <View style={{ width: 200, height: 80, marginTop: 20, justifyContent: 'space-evenly', alignItems: 'center' }}>
-                        <Text style={{ fontWeight: 'bold' }}>처음 만난 날</Text>
-                        <TextInput
+                    <View style={styles.input}>
+                        <View style={styles.inputComponent}>
+                            <Text style={{ fontWeight: 'bold' }}>처음 만난 날</Text>
+                            <TextInput
+                                style={styles.inputText}
+                                placeholder="2025-01-18"
+                                placeholderTextColor="gray"
+                                value={date}
+                                onChangeText={updateDate}
+                            />
+                        </View>
+                        <View style={styles.inputComponent}>
+                            <Text style={{fontWeight:'bold'}}>연인의 이름 입력하기</Text>
+                            <TextInput
+                            value={coupleName}
                             style={styles.inputText}
-                            placeholder="2025-01-18"
+                            placeholder="이름"
                             placeholderTextColor="gray"
-                            value={date}
-                            onChangeText={updateDate}
-                        />
-                    </View>
-                    <View style={{ alignItems: 'center' }}>
-                        <Text style={{ fontWeight: 'bold' }}>기념일 표시단위</Text>
-                        <RadioGroup
-                            radioButtons={radioButtons}
-                            onPress={(selectedId) => {
-                                setOptions(selectedId || "");
-                                handleRadioSelect(selectedId);
-                            }}
-                            selectedId={options === "100일 단위" ? "1" : "2"} // 초기값에 맞춰 설정
-                            layout="row"
-                        />
+                            onChangeText={setCoupleName}
+                            />
+                        </View>
                     </View>
                     <TouchableOpacity 
                         style={styles.modalbtn} 
@@ -121,6 +99,17 @@ const styles = StyleSheet.create({
     modaltitle : {
         fontSize: 22,
         fontWeight: 'bold'
+    },
+    input : { 
+        width: '100%', 
+        height: '60%',
+        justifyContent: 'space-evenly', 
+        alignItems: 'center',
+    },
+    inputComponent : {
+        height: '40%',
+        alignItems : 'center',
+        justifyContent : 'space-around'
     },
     inputText : {
         width: 150,

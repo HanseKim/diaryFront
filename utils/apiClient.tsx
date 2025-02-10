@@ -1,6 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AppContext } from "../contexts/appContext";
 
 // Axios 인스턴스 생성
 export const apiClient = axios.create({
@@ -10,12 +11,13 @@ export const apiClient = axios.create({
     "Content-Type": "application/json",
   },
 });
+
 export const fetchChatList = async (g: string) => {
   try {
     const token = await AsyncStorage.getItem("jwtToken"); // 저장된 토큰 가져오기
     if (!token) throw new Error("No token found");
 
-    const response = await apiClient.post("/chat/list", 
+    const response = await apiClient.post("/chat/list",
       { group_id: g },
       {
         headers: {
@@ -38,20 +40,20 @@ export const fetchGroupId = async () => {
 
     const response = await apiClient.post(
       "/chat/findGroup",
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // 🔹 토큰 추가
-        },
-      }
     );
 
     const res = response.data;
-    await AsyncStorage.setItem("gid", res["result"]);
-    return res;
+    if (res['success']) {
+      await AsyncStorage.setItem("groupid", JSON.stringify(res["result"]));
+      return true;
+    }
+    else {
+      return false;
+    }
   } catch (error) {
     console.error("Error fetching group ID:", error);
-    throw error;
+    
+    return false;
   }
 };
 
@@ -59,15 +61,14 @@ export const fetchGroupId = async () => {
 // JWT 토큰을 헤더에 설정
 export const setAuthToken = async () => {
   const token = await AsyncStorage.getItem("jwtToken"); // JWT 토큰을 AsyncStorage에서 가져옴
-  if (token) {
-    apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  } else {
-    delete apiClient.defaults.headers.common["Authorization"];
-  }
+  return `Bearer ${token}`;
 };
 
 apiClient.interceptors.request.use(async (config) => {
-  await setAuthToken(); // 토큰 설정
+  const token = await setAuthToken(); // 토큰 설정
+  if (token) {
+    config.headers.Authorization = token;
+  }
   return config;
 }, (error) => Promise.reject(error));
 
@@ -84,8 +85,9 @@ export const login = async (id: string, password: string) => {
     }
 
     await AsyncStorage.setItem("jwtToken", token);
+    await AsyncStorage.setItem("userid", id);
+    await AsyncStorage.setItem("userpwd", password);
     await AsyncStorage.setItem("userInfo", JSON.stringify(user));
-    await setAuthToken();
 
     console.log("Diary Counts : ", user.diaryCounts);
     console.log("CoupleCounts : ", user.coupleCounts);
@@ -112,6 +114,30 @@ export const login = async (id: string, password: string) => {
 export const fetchData = async () => {
   const response = await apiClient.get("/protected-route");
   return response.data;
+};
+
+// 기본 사용법
+export const fetchCoupleCheck = async () => {
+  try {
+    const token = await AsyncStorage.getItem("jwtToken"); // 저장된 토큰 가져오기
+    if (!token) throw new Error("No token found");
+    console.log(token);
+    const response = await apiClient.post(
+      "/checkCouple",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // 🔹 토큰 추가
+        },
+      }
+    );
+
+    const res = response.data;
+    console.log(res);
+    return res;
+  } catch (error) {
+    console.error("Error fetching couple", error);
+    throw error;
+  }
 };
 
 axios.interceptors.response.use(
