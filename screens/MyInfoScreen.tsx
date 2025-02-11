@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, {useEffect, useState} from 'react';
 import {
   Alert,
@@ -21,47 +14,79 @@ import * as Animatable from 'react-native-animatable';
 
 const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
   const [modal, setModal] = useState<number>(0);
-  const [userInfo, setUserInfo] = useState<any>(null); // 사용자 정보 상태 추가
-  const [animateUser, setAnimateUser] = useState(false); // 애니메이션 트리거
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [animateUser, setAnimateUser] = useState(false);
+  const [daysPassed, setDaysPassed] = useState<number>(0);
+  const [coupleName, setCoupleName] = useState<string>("");
+  const [couple_month, setCoupleMonth] = useState<number>(0);
+  const [couple_all, setCoupleAll] = useState<number>(0);
 
   const handleModal = (modal_num: number) => setModal(modal_num);
 
-  // AsyncStorage에서 사용자 정보 가져오기
-  const getUserInfo = async () => {
+  // DB에서 최신 사용자 정보 가져오기
+  const fetchLatestUserInfo = async () => {
     try {
+      const storedUserInfo = await AsyncStorage.getItem("userInfo");
+      const currentUserInfo = storedUserInfo ? JSON.parse(storedUserInfo) : null;
+      
+      if (currentUserInfo?.id) {
+        const response = await apiClient.get(`/userprofile/${currentUserInfo.id}`);
+        
+        if (response.data.success) {
+          const updatedUserInfo = {
+            ...currentUserInfo,
+            ...response.data.userInfo,
+            month_diary: response.data.userInfo.month_diary,
+            all_diary: response.data.userInfo.all_diary,
+            diaryCounts: response.data.userInfo.diaryCounts,
+            coupleCounts: response.data.userInfo.coupleCounts
+          };
+
+          // AsyncStorage와 상태 모두 업데이트
+          await AsyncStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
+          setUserInfo(updatedUserInfo);
+          
+          // 관련 상태들 업데이트
+          setCoupleName(updatedUserInfo.coupleName || "");
+          setCoupleMonth(updatedUserInfo.couple_month || 0);
+          setCoupleAll(updatedUserInfo.couple_all || 0);
+          
+          const days = calculateDaysPassed(updatedUserInfo);
+          setDaysPassed(days + 1);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching latest user info:", error);
+      // 에러 발생 시 기존 AsyncStorage 데이터로 폴백
       const storedUserInfo = await AsyncStorage.getItem("userInfo");
       if (storedUserInfo) {
         setUserInfo(JSON.parse(storedUserInfo));
       }
-    } catch (error) {
-      console.error("Error retrieving user info:", error);
     }
   };
 
-  const calculateDaysPassed = (): number => {
-    if (!userInfo || !userInfo.date) return -1; // userInfo가 없거나 date가 없으면 -1 반환
-    const startDate = new Date(userInfo.date); // userInfo.date 사용
+  const calculateDaysPassed = (info: any): number => {
+    if (!info || !info.date) return -1;
+    const startDate = new Date(info.date);
     const today = new Date();
     const diffTime = today.getTime() - startDate.getTime();
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24)); // 밀리초를 일로 변환
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const [daysPassed, setDaysPassed] = useState<number>(calculateDaysPassed()+1);
-  const [coupleName, setCoupleName] = useState<string>("");
-  const [couple_month, setCoupleMonth] = useState<number>(0);
-  const [couple_all, setCoupleAll] = useState<number>(0);
-  
-  useEffect(() => {
-    if (userInfo) {
-      const days = calculateDaysPassed();
-      setDaysPassed(days+1);
-      setCoupleName(userInfo.coupleName || "");
-      setCoupleMonth(userInfo.couple_month || 0);
-      setCoupleAll(userInfo.couple_all || 0);
-    }
-  }, [userInfo?.date, userInfo?.coupleName, userInfo?.couple_month, userInfo?.couple_all]); // 더 구체적인 의존성
+  // 화면에 포커스될 때마다 최신 데이터 가져오기
+  useFocusEffect(
+    React.useCallback(() => {
+      setAnimateUser(true);
+      fetchLatestUserInfo();
 
-  // 사용자 정보를 업데이트하고 데이터베이스에 저장
+      const resetAnimations = setTimeout(() => {
+        setAnimateUser(false);
+      }, 1000);
+
+      return () => clearTimeout(resetAnimations);
+    }, [])
+  );
+
   const updateUserInfo = async (newDate: string, coupleName: any) => {
     try {
       const response = await apiClient.post("/userprofile", {
@@ -74,47 +99,18 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
       });
   
       if (response.data.success) {
-        // 모든 필요한 필드를 포함하여 상태 업데이트
-        const updatedUserInfo = {
-          ...userInfo,
-          date: newDate,  // 새로운 날짜 추가
-          coupleName: response.data.coupleName,
-          couple_month_diary: userInfo.couple_month,
-          couple_all_diary: userInfo.couple_all,
-        };
-  
-        // 모든 관련 상태 동시에 업데이트
-        setUserInfo(updatedUserInfo);
-        setCoupleName(response.data.coupleName);
-        setCoupleMonth(userInfo.couple_month);
-        setCoupleAll(userInfo.couple_all);
-        setDaysPassed(calculateDaysPassed()+1); // 날짜 재계산
-  
-        // AsyncStorage 업데이트
-        await AsyncStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
-        
-        console.log("Updated UserInfo:", updatedUserInfo);
+        // 업데이트 후 최신 데이터 다시 가져오기
+        await fetchLatestUserInfo();
       } else {
         console.error("Error:", response.data.message);
       }
     } catch (error) {
-      // 에러 메시지 확인 후 Alert 처리
-      if (error instanceof Error && (error as any).response && (error as any).response.data) {
+      if (error instanceof Error && (error as any).response?.data) {
         const { message } = (error as any).response.data;
         if (message === "already couple") {
-          Alert.alert(
-            "경고",
-            "이미 커플이 있습니다.",
-            [{ text: "확인", onPress: () => console.log("Alert dismissed") }],
-            { cancelable: false }
-          );
+          Alert.alert("경고", "이미 커플이 있습니다.");
         } else if (message === "The specified user does not exist.") {
-          Alert.alert(
-            "오류",
-            "지정된 사용자를 찾을 수 없습니다.",
-            [{ text: "확인", onPress: () => console.log("Alert dismissed") }],
-            { cancelable: false }
-          );
+          Alert.alert("오류", "지정된 사용자를 찾을 수 없습니다.");
         } else {
           Alert.alert("오류", "알 수 없는 문제가 발생했습니다.");
         }
@@ -127,65 +123,49 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
 
   const renderModal = () => {
     switch(modal) {
-      case 0:
-        return <></>;
-      case 1: 
-        return <UserModal handlemodal={handleModal} updateUserInfo={updateUserInfo}/>;
-      default:
-        return <></>;
+      case 0: return <></>;
+      case 1: return <UserModal handlemodal={handleModal} updateUserInfo={updateUserInfo}/>;
+      default: return <></>;
     }
   }
+
   const renderCouple = () => {
     if(coupleName != ""){
       return (
-      <Animatable.View
-        animation={animateUser ? 'fadeInUp' : undefined}
-        duration={800}       // 애니메이션 지속 시간
-        delay={500}          // 애니메이션 딜레이 (ms)
-        style={{ marginBottom: 20 }}
-      >
-        <CoupleInfoComponent 
-          name={coupleName}
-          handleModal={handleModal} 
-          couple_month={couple_month || 0}
-          couple_all={couple_all || 0}
-          diarycount = {userInfo ? userInfo.coupleCounts || 0 : 0}
-          daysPassed={daysPassed}
-        />
-      </Animatable.View>)
+        <Animatable.View
+          animation={animateUser ? 'fadeInUp' : undefined}
+          duration={800}
+          delay={500}
+          style={{ marginBottom: 20 }}
+        >
+          <CoupleInfoComponent 
+            name={coupleName}
+            handleModal={handleModal} 
+            couple_month={couple_month || 0}
+            couple_all={couple_all || 0}
+            diarycount={userInfo ? userInfo.coupleCounts || 0 : 0}
+            daysPassed={daysPassed}
+          />
+        </Animatable.View>
+      );
     }
-    else return <></>;
+    return <></>;
   }
-
-  useFocusEffect(
-    React.useCallback(() => {
-      // 페이지에 들어올 때 애니메이션 트리거
-      setAnimateUser(true);
-      getUserInfo();
-
-      // 애니메이션 종료 시 상태 초기화
-      const resetAnimations = setTimeout(() => {
-        setAnimateUser(false);
-      }, 1000); // 애니메이션 지속 시간과 일치시킴
-
-      return () => clearTimeout(resetAnimations); // 언마운트 시 클린업
-    }, [])
-  );
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor:'white' }}>
       {renderModal()}
       <Animatable.View
         animation={animateUser ? 'fadeInUp' : undefined}
-        duration={500}       // 애니메이션 지속 시간
-        delay={100}          // 애니메이션 딜레이 (ms)
+        duration={500}
+        delay={100}
         style={{ marginBottom: 10 }}
       >
         <UserInfoComponent 
           name={userInfo ? userInfo.nickname || "???" : "???"} 
           month_diary={userInfo ? userInfo.month_diary || 0 : 0}
           all_diary={userInfo ? userInfo.all_diary || 0 : 0}
-          diarycount = {userInfo ? userInfo.diaryCounts || 0 : 0}
+          diarycount={userInfo ? userInfo.diaryCounts || 0 : 0}
           handleModal={handleModal} 
           daysPassed={daysPassed}
         />
