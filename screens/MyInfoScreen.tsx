@@ -140,11 +140,11 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
         >
           <CoupleInfoComponent 
             name={coupleName}
-            handleModal={handleModal} 
             couple_month={couple_month || 0}
             couple_all={couple_all || 0}
             diarycount={userInfo ? userInfo.coupleCounts || 0 : 0}
             daysPassed={daysPassed}
+            onDeleteSuccess={fetchLatestUserInfo}
           />
         </Animatable.View>
       );

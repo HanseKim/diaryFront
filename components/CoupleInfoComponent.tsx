@@ -5,17 +5,51 @@ import {
   Text,
   View,
   Image,
+  Alert,
 } from 'react-native';
+import { apiClient } from '../utils/apiClient';
 
 type CoupleInfoComponentProps = {
   name : string
-  handleModal : (modal:number) => void
   daysPassed : number
   diarycount : { [key: number]: number }
   couple_month : number
   couple_all : number
+  onDeleteSuccess: () => void 
 }
-const CoupleInfoComponent:React.FC<CoupleInfoComponentProps> = ({name,handleModal,daysPassed,diarycount, couple_month, couple_all}) => {
+const CoupleInfoComponent:React.FC<CoupleInfoComponentProps> = ({name,daysPassed,diarycount, couple_month, couple_all, onDeleteSuccess }) => {
+  const handleDeleteCouple = () => {
+    Alert.alert(
+      "커플 삭제",
+      "정말 커플 관계를 삭제하시겠습니까?",
+      [
+        {
+          text: "취소",
+          style: "cancel"
+        },
+        {
+          text: "삭제",
+          style: "destructive",  // iOS에서 빨간색으로 표시됩니다
+          onPress: async () => {
+            try {
+              const response = await apiClient.post("/delete-couple");
+              if (response.data.success) {
+                Alert.alert("성공", "커플 관계가 삭제되었습니다.");
+                onDeleteSuccess(); 
+                // 성공 후 필요한 상태 업데이트나 화면 새로고침 로직 추가
+              } else {
+                Alert.alert("오류", "커플 삭제에 실패했습니다.");
+              }
+            } catch (error) {
+              console.error("Error deleting couple:", error);
+              Alert.alert("오류", "서버 오류가 발생했습니다.");
+            }
+          }
+        }
+      ]
+    );
+  };
+  
   const mood = ['sad','angry','normal','smile','happy'];
   const moodImages: { [key: string]: any } = {
     sad: require("../images/sad.png"),
@@ -38,10 +72,11 @@ const CoupleInfoComponent:React.FC<CoupleInfoComponentProps> = ({name,handleModa
           }}>{daysPassed!==-1 ? `D+${daysPassed}` : "D+???"}</Text>
         </View>
         <View style={{height:30}}>
-          <TouchableOpacity onPress={()=>handleModal(2)}>
+          <TouchableOpacity onPress={handleDeleteCouple}>
             <Text style={{
               paddingTop: 10,
-            }}>수정하기</Text>
+              color: '#FF5C85'
+            }}>커플 삭제하기</Text>
           </TouchableOpacity>
         </View>
       </View>
