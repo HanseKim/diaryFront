@@ -150,17 +150,22 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
         <View style={{width: '100%', height: '12%'}}>
           <View style={{flexDirection:'row', width: '100%', height: '50%', marginTop:20, justifyContent:'space-between'}}>
             <Text style={{width: '20%',height:'100%', textAlign: 'center', fontSize: 30}}>{emoteToday}</Text>
-            <TouchableOpacity 
-              onPress={() => navigation.navigate('EditDiaryScreen', {diaryId: diary?.id } )} 
-              style={{
-                width:'17%',
-                height: '100%', 
-                marginRight: 30,
-                alignItems: 'flex-end', 
-                justifyContent: 'center'
-              }}>
-              <Text style={{fontSize: 16, width: '100%', textAlign: 'right'}}>edit</Text>
-            </TouchableOpacity>
+            {
+              diary?.id ? (
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('EditDiaryScreen', {diaryId: diary?.id } )} 
+                style={{
+                  width:'17%',
+                  height: '100%', 
+                  marginRight: 30,
+                  alignItems: 'flex-end', 
+                  justifyContent: 'center'
+                }}>
+                <Text style={{fontSize: 16, width: '100%', textAlign: 'right'}}>edit</Text>
+              </TouchableOpacity>) 
+              :(<></>)
+            }
+            
           </View>
           <View style={{height:'40%', marginTop:'5%'}}>
             <View style={[styles.highlightBox, {marginLeft: 10}]}>
