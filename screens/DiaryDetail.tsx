@@ -177,7 +177,7 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
 
         <View style={{flexDirection: 'row', width: '100%', height: '10%', marginTop: "10%",marginBottom: '5%'}}>
           <View style={{width: '90%', height: '100%', margin: '5%'}}>
-            {diary == null ? <Text></Text>
+            {diary == null ? <></>
             : <Text 
                 numberOfLines={1}
                 ellipsizeMode="tail"

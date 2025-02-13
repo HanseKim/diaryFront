@@ -179,13 +179,14 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
                             });
                             const emoteToday = setEmoteType(matchedDiary?.feeling);
                             return (
-                                <View style={[styles.dateBox, {borderColor: borderColor, borderWidth: 4}]} >
+                                <View style={[styles.dateBox, {borderColor: borderColor, borderWidth: 4}]} key={colIndex}>
                                     {date ? (
                                         <TouchableOpacity onPress={() => navigation.navigate('Detail', {clickdate: date, clickmonth: month, clickyear: year, userid : userid})} 
                                             style={{height:'100%'}}
-                                            key={colIndex}>
+                                            // key={colIndex}
+                                            >
                                             <Text style={[styles.dateText, { color: textColor}]}>
-                                            {date}
+                                                {date}
                                             </Text>
                                             {matchedDiary ? (
                                                 <>
@@ -200,11 +201,11 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
                                                     {matchedDiary?.title}
                                                 </Text></>
                                             ) : (
-                                                <> </>
+                                                null
                                             )}
                                         </TouchableOpacity>
                                     ) : (
-                                        <Text style={styles.dateText} key={colIndex}> </Text>
+                                        <View style={styles.dateText}/>
                                     )}
                                 </View>
                             );
