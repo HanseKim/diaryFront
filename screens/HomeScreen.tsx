@@ -80,6 +80,9 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
     const goToNextMonth = () => {
         setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)));
     };
+    const goToToday = () => {
+        setCurrentDate(new Date());
+    };
     const getUserInfo = async () => {
         try { 
             const storedUserInfo = await AsyncStorage.getItem("userInfo");
@@ -138,10 +141,16 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
             <Image source={require('../images/logo.png')} style={{ width: '100%', height: '10%' }} />
             <View style={{ paddingTop:'3%', width: '100%',flex:1,  alignItems: 'center', backgroundColor: '#FADFEC', marginTop: '5%', borderRadius: 10, shadowOffset: { width: 0, height: 2 }, shadowColor: '#F5BFD9', shadowOpacity: 0.5, shadowRadius: 2 }}>
                 <View style={styles.headerContainer}>
+                    <Text style={styles.headerText}>{monthName} {year}</Text>
                     <TouchableOpacity onPress={goToPreviousMonth} style={{}}>
                         <Text style={{}}>◀</Text>
                     </TouchableOpacity>
-                    <Text style={styles.headerText}>{monthName} {year}</Text>
+                    <TouchableOpacity 
+                        onPress={goToToday}
+                        style={styles.todayButton}
+                    >
+                        <Text style={styles.todayButtonText}>Today</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={goToNextMonth} style={{}}>
                         <Text style={{}}>▶</Text>
                     </TouchableOpacity>
@@ -219,7 +228,7 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
 
 const styles = StyleSheet.create({
     headerContainer: {
-        justifyContent: 'space-around',
+        justifyContent: 'space-evenly',
         alignItems: 'center',
         textAlign: 'center',
         flexDirection: 'row',
@@ -228,18 +237,35 @@ const styles = StyleSheet.create({
         width: '98%',
         height: '10%',
         borderRadius: 10,
-      },
-      headerText: {
+        paddingHorizontal: 10,
+    },
+    headerText: {
         fontSize: 30,
         fontFamily: 'Manrope'
-      },
-      row: {
+    },
+    todayButton: {
+        backgroundColor: '#F5BFD9',
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 1,
+    },
+    todayButtonText: {
+        color: '#333',
+        fontSize: 14,
+        fontWeight: '600',
+        fontFamily: 'Manrope',
+    },
+    row: {
         width: '100%',
         flex: 1, 
         flexDirection: 'row',
         justifyContent: 'center',
-      },
-      weekdayBox: {
+    },
+    weekdayBox: {
         borderRadius: 5,
         width: '12%',
         height: '90%',
@@ -247,28 +273,28 @@ const styles = StyleSheet.create({
         marginLeft: '1%',
         justifyContent: 'center',
         alignItems: 'center',
-      },
-      weekdayText: {
+    },
+    weekdayText: {
         color: 'white',
         fontSize: 14,
         fontWeight: '600',
         fontFamily: 'Manrope'
-      },
-      dateBox: {
+    },
+    dateBox: {
         backgroundColor: 'white',
         marginRight: '1%',
         marginLeft: '1%',
         width: '12%',
         height: '90%',
         borderRadius: 5,
-      },
-      dateText: {
+    },
+    dateText: {
         width: '40%',
         borderRadius: 3,
         fontSize: 14,
         fontFamily: 'Manrope',
         backgroundColor: "white"
-      },
+    },
 });
 
 export default HomeScreen;
