@@ -14,7 +14,6 @@ import {
   Keyboard,
   Alert,
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { io } from "socket.io-client";
 import { AppContext } from "../contexts/appContext";
 import { fetchChatList } from "../utils/apiClient";

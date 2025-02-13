@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {
   Alert,
+  StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native'; 
@@ -11,6 +13,7 @@ import UserModal from '../components/UserModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '../utils/apiClient';
 import * as Animatable from 'react-native-animatable';
+import { createNativeWrapper } from 'react-native-gesture-handler';
 
 const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
   const [modal, setModal] = useState<number>(0);
@@ -22,6 +25,21 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
   const [couple_all, setCoupleAll] = useState<number>(0);
 
   const handleModal = (modal_num: number) => setModal(modal_num);
+  const handleLogout = async () => {
+    try {
+      // AsyncStorage에서 userInfo와 토큰 삭제
+      await AsyncStorage.removeItem("userInfo");
+      await AsyncStorage.removeItem("userid");
+      await AsyncStorage.removeItem("userpwd");
+      await AsyncStorage.removeItem("jwtToken"); // 토큰 키 이름에 따라 변경
+  
+      // 로그인 화면으로 이동
+      navigation.navigate('Login'); // 로그인 화면의 이름에 따라 변경
+    } catch (error) {
+      console.error("Error during logout:", error);
+      Alert.alert("오류", "로그아웃 중 문제가 발생했습니다.");
+    }
+  };
 
   // DB에서 최신 사용자 정보 가져오기
   const fetchLatestUserInfo = async () => {
@@ -171,8 +189,35 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
         />
       </Animatable.View>
       {renderCouple()}
+      <Animatable.View
+        animation={animateUser ? 'fadeInUp' : undefined}
+        duration={1000}
+        delay={500}
+        style={{ marginBottom: 10 }}
+      >
+        <TouchableOpacity 
+          onPress={handleLogout}
+          style={styles.logoutbtn}>
+          <Text style={{ color: 'black', fontWeight:'bold' }}>
+            로그아웃
+          </Text>
+        </TouchableOpacity>
+      </Animatable.View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  logoutbtn: {
+    width: 250, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    borderRadius: 30,
+    backgroundColor: 'rgba(255, 92, 133, 0.1)', // 배경색에 투명도 적용
+    borderWidth: 2,
+    borderColor: 'rgba(255, 92, 133, 0.5)'
+  },
+});
 
 export default MyInfoScreen;

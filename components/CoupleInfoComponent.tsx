@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   container : {
     width: 350,
     height: 300,
-    marginBottom: 15,
+    marginBottom: 5,
     padding: 10,
     backgroundColor: 'white',
     borderRadius: 20,
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 10,
-    elevation: 5,
+    elevation: 8,
   },
   title : {
     flex: 0.3,
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     margin: 10,
     marginBottom: 40,
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   contents : {
     margin: 10,
