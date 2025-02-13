@@ -104,10 +104,10 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
       return () => clearTimeout(resetAnimations);
     }, [])
   );
-
-  const updateUserInfo = async (newDate: string, coupleName: any) => {
+  
+  const updateUserInfo = async (newDate: string, coupleName : any) => {
     try {
-      const response = await apiClient.post("/userprofile", {
+      const response = await apiClient.post("/userprofile/all", {
         nickname: userInfo.nickname,
         id: userInfo.id, 
         date: newDate,
@@ -138,11 +138,30 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
       console.error("Error updating couple info:", error);
     }
   };
+  const updateUserDate = async (newDate: string) =>{
+    try{
+      const response = await apiClient.post("/userprofile/date", {
+        nickname: userInfo.nickname,
+        id: userInfo.id, 
+        date: newDate,
+      });
+  
+      if (response.data.success) {
+        // 업데이트 후 최신 데이터 다시 가져오기
+        await fetchLatestUserInfo();
+      } else {
+        console.error("Error:", response.data.message);
+      }
+    } catch (error) {
+      Alert.alert("오류", "서버와의 연결 중 문제가 발생했습니다.");
+      console.error("Error updating couple info:", error);
+    }
+  }
 
   const renderModal = () => {
     switch(modal) {
       case 0: return <></>;
-      case 1: return <UserModal handlemodal={handleModal} updateUserInfo={updateUserInfo}/>;
+      case 1: return <UserModal handlemodal={handleModal} updateUserInfo={updateUserInfo} updateUserDate={updateUserDate}/>;
       default: return <></>;
     }
   }

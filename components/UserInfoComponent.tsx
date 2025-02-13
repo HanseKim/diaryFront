@@ -14,7 +14,7 @@ type InfoComponentProps = {
   all_diary:number
   diarycount : { [key: number]: number }
   handleModal : (modal:number) => void
-  daysPassed: number
+  daysPassed: number,
 }
 const InfoComponent:React.FC<InfoComponentProps> = ({name,month_diary,all_diary,diarycount,handleModal,daysPassed}) => {
   const mood = ['sad','angry','normal','smile','happy'];

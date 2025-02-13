@@ -8,15 +8,15 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { TextInput } from "react-native-gesture-handler";
-import RadioGroup, {RadioButtonProps} from 'react-native-radio-buttons-group';
 
 type UserModalProps={
     handlemodal: (modal:number) => void
     updateUserInfo: (newDate: string, coupleName: string) => void
+    updateUserDate: (newDate: string) => void
 }
-const UserModal:React.FC<UserModalProps> = ({handlemodal, updateUserInfo}) => {
+const UserModal:React.FC<UserModalProps> = ({handlemodal, updateUserInfo, updateUserDate}) => {
     const [coupleName, setCoupleName] = useState<string>("");
-    const [date, updateDate] = useState<string>("");
+    const [date, setDate] = useState<string>("");
     
     const validateDate = (dateString: string) => {
         const regex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD 형식
@@ -28,9 +28,13 @@ const UserModal:React.FC<UserModalProps> = ({handlemodal, updateUserInfo}) => {
             console.log("날짜 입력 제대로");
             return;
         }
-        
-        updateUserInfo(date, coupleName); // updateUserInfo 호출
-        handlemodal(0); // 모달 닫기
+        if(coupleName === ''){
+            updateUserDate(date);
+            handlemodal(0);
+            return;
+        }
+        updateUserInfo(date, coupleName); 
+        handlemodal(0);
     };
 
     return (
@@ -53,7 +57,7 @@ const UserModal:React.FC<UserModalProps> = ({handlemodal, updateUserInfo}) => {
                                 placeholder="2025-01-18"
                                 placeholderTextColor="gray"
                                 value={date}
-                                onChangeText={updateDate}
+                                onChangeText={setDate}
                             />
                         </View>
                         <View style={styles.inputComponent}>
