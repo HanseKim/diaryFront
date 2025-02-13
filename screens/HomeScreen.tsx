@@ -136,7 +136,7 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
     return (
         <View style={{ flex: 1, alignItems: 'center', backgroundColor: 'white'}}>
             <Image source={require('../images/logo.png')} style={{ width: '100%', height: '10%' }} />
-            <View style={{ paddingTop:'3%', width: '100%', alignItems: 'center', backgroundColor: '#FADFEC', marginTop: '5%', borderRadius: 10, shadowOffset: { width: 0, height: 2 }, shadowColor: '#F5BFD9', shadowOpacity: 0.5, shadowRadius: 2 }}>
+            <View style={{ paddingTop:'3%', width: '100%',flex:1,  alignItems: 'center', backgroundColor: '#FADFEC', marginTop: '5%', borderRadius: 10, shadowOffset: { width: 0, height: 2 }, shadowColor: '#F5BFD9', shadowOpacity: 0.5, shadowRadius: 2 }}>
                 <View style={styles.headerContainer}>
                     <TouchableOpacity onPress={goToPreviousMonth} style={{}}>
                         <Text style={{}}>◀</Text>
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
       },
       row: {
         width: '100%',
-        height: '15%',
+        flex: 1, 
         flexDirection: 'row',
         justifyContent: 'center',
       },
