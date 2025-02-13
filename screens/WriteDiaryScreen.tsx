@@ -34,6 +34,7 @@ const PreDiaryQuestionsScreen: React.FC<{ navigation: any }> = ({ navigation }) 
         const prevDate = new Date(date);
         prevDate.setDate(date.getDate() - 1);
         setDate(prevDate);
+        generateRandomQuestions();
     };
 
     const handleNextDate = () => {
@@ -43,6 +44,7 @@ const PreDiaryQuestionsScreen: React.FC<{ navigation: any }> = ({ navigation }) 
 
         if (nextDate <= currentDate) {
             setDate(nextDate);
+            generateRandomQuestions();
         }
     };
 
