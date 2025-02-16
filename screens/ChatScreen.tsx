@@ -19,91 +19,97 @@ import {
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AppContext } from "../contexts/appContext";
-import { fetchChatList, fetchGroupId } from "../utils/apiClient";
-import { Axios } from "axios";
+import { fetchChatList, fetchGroupId, fetchCoupleCheck } from "../utils/apiClient";
+import { useFocusEffect } from "@react-navigation/native";
 
 type MessageProp = {
   id: string; user: string; text: string, date: string;
 }
 
 const ChatScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
-
   const appContext = useContext(AppContext);
 
   if (!appContext) {
     throw new Error("AppContext must be used within an AppProvider");
   }
 
+
   const { messages, setMessages } = appContext;
   const [chats, setChats] = useState<MessageProp[]>([{ id: '', user: '', text: '', date: '' }]);
   const [cnt, setCnt] = useState<number>(0);
   const [gid, setGid] = useState<string>("");
-  useEffect(() => {
-    async function loadchat() {
-      fetchGroupId;
-      const t = await AsyncStorage.getItem("gid");
-      if (t !== null) {
-        setGid(t);
-      }
-      const tmp = await AsyncStorage.getItem("chatdata");
-      if (tmp) {
-        console.log(tmp);
-        setChats(JSON.parse(tmp));
-        setMessages(JSON.parse(tmp));
-      } else {
-        console.log("empty");
-      }
-      console.log(chats);
+  const [isGroup, setIsGroup] = useState<boolean>(false);
 
-
-
-      const data = await fetchChatList(gid);
-      console.log(data);
-      if (data["msg"].length > 0) {
-        setChats(data["msg"]);
-        setCnt(data["msg"].length);
-      }
-      else {
-        setCnt(0);
-      }
-      console.log(chats);
-      
-    }
-
-    loadchat();
-    
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      async function loadchat() {
+        const isGroupResult = await fetchGroupId();
+        if (isGroupResult) {
+          setIsGroup(true);
+          const group_id = await AsyncStorage.getItem("groupid");
+          if (group_id !== null) {
+            setGid(group_id);
+          }
+          const tmp = await AsyncStorage.getItem("chatdata");
+          if (tmp) {
+            console.log(tmp);
+            setMessages(JSON.parse(tmp));
+          } else {
+            console.log("empty");
+          }
+          console.log("try fetch chat list");
   
-
+          const data = await fetchChatList();
+          console.log(data);
+          if (data["msg"].length > 0) {
+            setMessages((prev) => [...prev, data['msg']]);
+            setCnt(data["msg"].length);
+            //removeChat;
+          }
+          else {
+            setCnt(0);
+          }
+        }
+      }
+      loadchat();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
-      {
-        <TouchableOpacity
-          style={styles.chatRoomContainer}
-          onPress={async () => {
-            const userid = await AsyncStorage.getItem("userInfo");
-            const token = await AsyncStorage.getItem("jwtToken");
-            navigation.navigate("Message", {
-              token: token,
-              groupid: gid,
-              userid : userid,
-            })
-          }}>
-          {/* <Image source={{ uri: '' }} style={styles.avatar} /> */}
-          <View style={styles.chatDetails}>
-            <Text style={styles.chatName}>여자친구</Text>
-            <Text style={styles.chatMessage} numberOfLines={1}>
-              {chats.length > 0 ? chats[chats.length-1]?.text : "No message"}
-            </Text>
-          </View>
-          <View style={styles.chatMeta}>
-            <Text style={styles.chatTime}>{chats.length > 0 ? chats[chats.length-1]?.date : ""}</Text>
-            {cnt > 0 && (
-              <Text style={styles.unreadCount}>{cnt}</Text>
-            )}
-          </View>
-        </TouchableOpacity>
+      {isGroup ?
+        (
+          <TouchableOpacity
+            style={styles.chatRoomContainer}
+            onPress={async () => {
+              setMessages([]);
+              const userid = await AsyncStorage.getItem("userid");
+              const token = await AsyncStorage.getItem("jwtToken");
+              const g_id = await AsyncStorage.getItem("groupid")
+              navigation.navigate("Message", {
+                token: token,
+                groupid: g_id,
+                userid: userid,
+              })
+            }}>
+            {/* <Image source={{ uri: '' }} style={styles.avatar} /> */}
+            <View style={styles.chatDetails}>
+              <Text style={styles.chatName}>여자친구</Text>
+              <Text style={styles.chatMessage} numberOfLines={1}>
+                {messages.length > 0 ? messages[messages.length - 1]?.text : "No message"}
+              </Text>
+            </View>
+            <View style={styles.chatMeta}>
+              <Text style={styles.chatTime}>{messages.length > 0 ? messages[messages.length - 1]?.date : ""}</Text>
+              {cnt > 0 && (
+                <Text style={styles.unreadCount}>{cnt}</Text>
+              )}
+            </View>
+          </TouchableOpacity>
+        )
+        : (
+          <Text>not couple</Text>
+        )
       }
     </View>
   );
@@ -116,15 +122,15 @@ const styles = StyleSheet.create({
   },
   chatRoomContainer: {
     borderRadius: 8,
-    borderColor: 'white',
+    borderColor: '#F5BFD9',
     borderWidth: 1,
     shadowColor: "#F5BFD9",
     shadowOffset: {
-      width: 8,
-      height: 8,
+      width: 13,
+      height: 13,
     },
     shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowRadius: 6,
     elevation: 5,
     flexDirection: "row",
     alignItems: "center",

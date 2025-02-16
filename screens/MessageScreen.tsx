@@ -16,15 +16,15 @@ import {
 } from "react-native";
 import { io } from "socket.io-client";
 import { AppContext } from "../contexts/appContext";
-import { fetchChatList } from "../utils/apiClient";
 import moment from 'moment';
+import { useFocusEffect } from "@react-navigation/native";
 
 type MessageProp = {
   id: string; user: string; text: string, date: string;
 }
 
 const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
-  
+
   const [message, setMessage] = useState<string>("");
   //const [messages, setMessages] = useState<MessageProp[]>([]);
   const appContext = useContext(AppContext);
@@ -37,7 +37,7 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
 
   const { token, groupid, userid } = route.params;
 
-  const socket = io("http://localhost:80", {
+  const socket = io('http://10.0.2.2:80', {
     auth: {
       token, // 서버로 토큰 전달
     },
@@ -54,18 +54,9 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
   };
 
 
-  socket.on("cccc", async (data) => {
-    if (data["data"]["user"]!=='test1') {
-      data["data"].forEach((element : MessageProp) => {
-        setMessages((prev) => [...prev, element]);
-      });
-      
-    }
-    console.log(data["data"]);
-  });
 
   const flatListRef = useRef<FlatList<MessageProp>>(null); // FlatList 참조 생성
-  
+
   // 메시지 상태 변경 시 자동 스크롤
   useEffect(() => {
     if (messages.length > 0) {
@@ -73,23 +64,49 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
     }
   }, [messages]);
 
-  socket.on("new msg arrive" , (msg) => {
-    setMessages((prev) => [...prev, msg]);
+  socket.on("new msg arrive", (data, uid) => {
+    Alert.alert("new message arrived");
+    if (uid === userid) {
+
+    }
+    else {
+      setMessages((prev) => [...prev, data]);
+    }
   });
 
+  socket.on("new msg set", (data, uid) => {
+    //Alert.alert("new message set");
+    console.log("from chat data : ", data);
+    if (uid === userid) {
+    }
+    else {
+      setMessages((prev) => [...prev, ...data]);
+    }
+  });
+
+  useFocusEffect(
+    React.useCallback(() => {
+      async function loadchat() {
+        const tmp = await AsyncStorage.getItem("chatdata");
+        if (tmp) {
+          //console.log(tmp);
+          setMessages(JSON.parse(tmp));
+        } else {
+          console.log("empty");
+        }
+      }
+      loadchat();
+    }, [])
+  );
 
   useEffect(() => {
-    
-    joinRoom();
 
-    socket.on("test" , (text) => {
-      console.log(text);
-    });
+    joinRoom();
 
     return () => {
       //console.log("socket disconnected");
       leaveRoom();
-      //socket.disconnect();
+      socket.disconnect();
     }
   }, [])
 
@@ -99,30 +116,30 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
       try {
         const jsonValue = JSON.stringify(messages);
         await AsyncStorage.setItem("chatdata", jsonValue);
-        console.log("Messages saved to AsyncStorage:", jsonValue);
+        //console.log("Messages saved to AsyncStorage:", jsonValue);
       } catch (error) {
         console.error("Error saving messages to AsyncStorage:", error);
       }
     };
-  
+
     if (messages.length > 0) {
       saveMessagesToStorage();
     }
   }, [messages]);
 
-  const sendMessage = async() => {
+  const sendMessage = async () => {
     if (message.trim()) {
       const now = moment();
-      const newMessage = { id: Date.now().toString(), user: userid, text: message, date: now.format('YY-MM-DD HH:mm')};
+      const newMessage = { id: Date.now().toString(), user: userid, text: message, date: now.format('YY-MM-DD HH:mm') };
       socket.emit("new message", newMessage, groupid); // 메시지 서버로 전송
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-     
+
       setMessage("");
     }
   };
 
-  const renderMessage = (item: MessageProp, index : number) => (
-    <View style={[styles.messageContainer , item.user==userid ? {alignSelf : "flex-end"} : {alignSelf : "flex-start"}]}>
+  const renderMessage = (item: MessageProp, index: number) => (
+    <View style={[styles.messageContainer, item.user == userid ? { alignSelf: "flex-end" } : { alignSelf: "flex-start" }]}>
       <Text style={[styles.messageText]}>{item.text}</Text>
     </View>
   );
@@ -131,7 +148,7 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 , backgroundColor: "white"}}
+        style={{ flex: 1, backgroundColor: "white" }}
       >
         {/* 채팅 메시지 리스트 */}
         <FlatList

@@ -12,18 +12,14 @@ export const apiClient = axios.create({
   },
 });
 
-export const fetchChatList = async (g: string) => {
+export const fetchChatList = async () => {
   try {
     const token = await AsyncStorage.getItem("jwtToken"); // 저장된 토큰 가져오기
+    const g = await AsyncStorage.getItem("groupid");
     if (!token) throw new Error("No token found");
 
     const response = await apiClient.post("/chat/list",
       { group_id: g },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // 🔹 토큰 추가
-        },
-      }
     );
 
     return response.data;
@@ -56,7 +52,6 @@ export const fetchGroupId = async () => {
     return false;
   }
 };
-
 
 // JWT 토큰을 헤더에 설정
 export const setAuthToken = async () => {
