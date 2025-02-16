@@ -75,7 +75,7 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
   });
 
   socket.on("new msg set", (data, uid) => {
-    //Alert.alert("new message set");
+    Alert.alert("new message set => send id : " , uid);
     console.log("from chat data : ", data);
     if (uid === userid) {
     }
