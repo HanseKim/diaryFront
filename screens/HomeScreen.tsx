@@ -103,7 +103,7 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
                 const parsedUserInfo = JSON.parse(storedUserInfo);
                 setUserid(parsedUserInfo.id); // userInfo에서 id를 설정
             }
-            const response = await fetch(`http://10.0.2.2:80/Home`, {
+            const response = await fetch(`http://10.0.2.2:80/home`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

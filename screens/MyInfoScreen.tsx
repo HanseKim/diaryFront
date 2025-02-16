@@ -48,7 +48,7 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
       const currentUserInfo = storedUserInfo ? JSON.parse(storedUserInfo) : null;
       
       if (currentUserInfo?.id) {
-        const response = await apiClient.get(`/userprofile/${currentUserInfo.id}`);
+        const response = await apiClient.get(`/mypage/${currentUserInfo.id}`);
         
         if (response.data.success) {
           const updatedUserInfo = {
@@ -107,7 +107,7 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
   
   const updateUserInfo = async (newDate: string, coupleName : any) => {
     try {
-      const response = await apiClient.post("/userprofile/all", {
+      const response = await apiClient.post("/mypage/all", {
         nickname: userInfo.nickname,
         id: userInfo.id, 
         date: newDate,
@@ -140,7 +140,7 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
   };
   const updateUserDate = async (newDate: string) =>{
     try{
-      const response = await apiClient.post("/userprofile/date", {
+      const response = await apiClient.post("/mypage/date", {
         nickname: userInfo.nickname,
         id: userInfo.id, 
         date: newDate,

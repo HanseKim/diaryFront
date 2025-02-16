@@ -164,7 +164,7 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
             diary_date: `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`,
         };
         try {
-            const response = await fetch('http://10.0.2.2:80/write-diary', {
+            const response = await fetch('http://10.0.2.2:80/diary/write', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

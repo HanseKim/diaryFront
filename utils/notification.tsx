@@ -92,7 +92,7 @@ export async function scheduleDailyNotification() {
     
     // 현재 시간을 기준으로 다음 알림 시간 설정 (오후 10시 52분)
     const date = new Date();
-    date.setHours(23, 29, 0, 0);
+    date.setHours(17, 33, 0, 0);
 
     // 만약 현재 시간이 이미 지났다면 다음 날로 설정
     if (date.getTime() < Date.now()) {
@@ -134,7 +134,7 @@ export async function initializeNotifications() {
   
   // 일일 알림 스케줄 설정
   await scheduleDailyNotification();
-  //onDisplayNotification('이거나 먹어라', '개쉐이들아');
+  onDisplayNotification('이거나 먹어라', '개쉐이들아');
 }
 
 // 즉시 알림 표시

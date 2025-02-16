@@ -105,7 +105,7 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
 
   const fetchUsers = async (userId: string, diaryDate: string) => {
     try {
-      const response = await fetch(`http://10.0.2.2:80/Detail`,
+      const response = await fetch(`http://10.0.2.2:80/detail`,
         {
           method: 'POST',
           headers: {

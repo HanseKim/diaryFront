@@ -99,7 +99,7 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
 
         // FCM 토큰 서버 저장
         if (fcmToken) {
-          const url = 'http://10.0.2.2:80/save-fcm-token';
+          const url = 'http://10.0.2.2:80/login/save-fcm-token';
           await fetch(url, {
             method: 'POST',
             headers: {

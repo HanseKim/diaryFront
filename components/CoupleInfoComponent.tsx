@@ -32,7 +32,7 @@ const CoupleInfoComponent:React.FC<CoupleInfoComponentProps> = ({name,daysPassed
           style: "destructive",  // iOS에서 빨간색으로 표시됩니다
           onPress: async () => {
             try {
-              const response = await apiClient.post("/delete-couple");
+              const response = await apiClient.post("/mypage/delete-couple");
               if (response.data.success) {
                 Alert.alert("성공", "커플 관계가 삭제되었습니다.");
                 onDeleteSuccess(); 

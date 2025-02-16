@@ -37,7 +37,7 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   // 서버에서 일기 데이터를 가져오는 함수
   const fetchDiaryData = async (userId: string) => {
     try {
-      const response = await fetch(`http://10.0.2.2:80/search-diary`, {
+      const response = await fetch(`http://10.0.2.2:80/diary/search-diary`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const RegisterScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
   const handleRegister = async (nickname: string, id: string, password: string) => {
     try {
-      const response = await fetch("http://10.0.2.2:80/register", {
+      const response = await fetch("http://10.0.2.2:80/login/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

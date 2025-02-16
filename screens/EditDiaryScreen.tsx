@@ -38,7 +38,7 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
   const fetchDiaryData = async () => {
     try {
         console.log(diaryId);
-        const response = await fetch(`http://10.0.2.2:80/edit-search`, {
+        const response = await fetch(`http://10.0.2.2:80/diary/edit-search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
     console.log("diaryDate : ",diaryData);
 
     try {
-      const response = await fetch('http://10.0.2.2:80/edit-diary', {
+      const response = await fetch('http://10.0.2.2:80/diary/edit-diary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(diaryData),
