@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import LoginInputScreen from '../components/LoginInputScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { login } from '../utils/apiClient';
+import { login, setFcm } from '../utils/apiClient';
 import messaging from '@react-native-firebase/messaging';
 
 const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
@@ -47,27 +47,18 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
         // loginResult와 token이 있는지 확인
         // 로그인 성공 여부 체크
         if (!loginResult) {
-          await AsyncStorage.multiRemove(['jwtToken', 'userid', 'userpwd']);
+          await AsyncStorage.multiRemove(['jwtToken', 'userid', 'userpwd', 'userInfo']);
           throw new Error('Login response is invalid');
         }
         else {
-          /*
+          
           const fcmToken = await getFCMToken();
 
           // FCM 토큰 서버 저장
           if (fcmToken) {
-            const url = 'http://10.0.2.2:80/save-fcm-token';
-            await fetch(url, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                token: fcmToken
-              }),
-            });
+            setFcm(fcmToken);
           }
-            */
+            
           navigation.reset({
             index: 0,
             routes: [{ name: 'Main' }],
@@ -79,6 +70,7 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
 
     }
   };
+
 
 
 

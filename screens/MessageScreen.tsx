@@ -37,7 +37,7 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
 
   const { token, groupid, userid } = route.params;
 
-  const socket = io('http://10.0.2.2:80', {
+  const socket = io("http://10.0.2.2:80/", {
     auth: {
       token, // 서버로 토큰 전달
     },
