@@ -12,6 +12,15 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
+import axios from 'axios';
+export const apiClient = axios.create({
+  //baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
+  baseURL: "http://127.0.0.1:80/", //IOS 에뮬레이터용
+  headers: {
+      "Content-Type": "application/json",
+  },
+});
+
 interface DiaryEntry {
   id: string;
   title: string;
@@ -37,24 +46,17 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   // 서버에서 일기 데이터를 가져오는 함수
   const fetchDiaryData = async (userId: string) => {
     try {
-      const response = await fetch(`http://10.0.2.2:80/diary/search-diary`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userId,
-        }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        const sortedData = data.sort((a: DiaryEntry, b: DiaryEntry) => 
+      const response = await apiClient.post('/diary/search-diary',{
+        user_id : userId,
+      })
+      if (response.status === 200) {
+        const sortedData = response.data.sort((a: DiaryEntry, b: DiaryEntry) => 
           new Date(b.diary_date).getTime() - new Date(a.diary_date).getTime()
         );
         setDiaryData(sortedData);
-        setFilteredResults(sortedData); 
+        setFilteredResults(sortedData);
       } else {
-        console.error('Error fetching diary data:', data);
+        console.error('Error fetching diary data:', response.data);
       }
     } catch (error) {
       console.error('Error fetching diary data:', error);

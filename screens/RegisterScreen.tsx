@@ -3,30 +3,37 @@ import {
   View,
   Image,
   StyleSheet,
-  ScrollView
+  ScrollView,
+  Platform
 } from 'react-native';
 import RegisterInputScreen from '../components/RegisterInputScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+export const apiClient = axios.create({
+  //baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
+  baseURL: "http://127.0.0.1:80/", //IOS 에뮬레이터용
+  headers: {
+      "Content-Type": "application/json",
+  },
+});
 
 const RegisterScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
   const handleRegister = async (nickname: string, id: string, password: string) => {
     try {
-      const response = await fetch("http://10.0.2.2:80/login/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ nickname, id, password }),
-      });
-      const data = await response.json();
-      if (data.success) {
+      const url = Platform.OS =='android' ? '10.0.2.2:80' : '127.0.0.1:80'
+      const response = await apiClient.post('/login/register',{
+        nickname:nickname, 
+        id : id, 
+        password : password 
+      })
+      if (response.status === 200) {
         console.log("Registration successful!");
         navigation.reset({
           index: 0,
           routes: [{ name: 'Login' }],
         });
       } else {
-        console.error("Registration failed:", data.message);
+        console.error("Registration failed:", response.data);
       }
     } catch (error) {
       console.error("Error during registration:", error);

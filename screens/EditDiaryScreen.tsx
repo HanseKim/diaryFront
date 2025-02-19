@@ -14,11 +14,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Platform,
 } from 'react-native';
 import axios from 'axios';
 
 export const apiClient = axios.create({
-  baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
+  //baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
+  baseURL: "http://127.0.0.1:80/", // ios
   headers: {
     "Content-Type": "application/json",
   },
@@ -37,28 +39,23 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
   // 백엔드에서 일기 데이터 가져오기
   const fetchDiaryData = async () => {
     try {
-        console.log(diaryId);
-        const response = await fetch(`http://10.0.2.2:80/diary/edit-search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: diaryId,
-        }),
+      console.log(diaryId);
+
+      const response = await apiClient.post(`/diary/edit-search`, {
+        id: diaryId,
       });
-      const data = await response.json();
-      if(response){
-        setDate(new Date(data.diary_date));
-        setDay(data.diary_date);
-        setHeadline(data.title);
-        setContent(data.content);
-        setUser_id(data.user_id);
-        setMood(data.feeling ? ['😞', '😠', '😐', '😊', '😄'][data.feeling - 1] : null);
-        setPrivacy(data.privacy); // "Private" or "Couple"
-        console.log("Data: ",data)
+
+      if(response.status === 200) {
+        setDate(new Date(response.data.diary_date));
+        setDay(response.data.diary_date);
+        setHeadline(response.data.title);
+        setContent(response.data.content);
+        setUser_id(response.data.user_id);
+        setMood(response.data.feeling ? ['😞', '😠', '😐', '😊', '😄'][response.data.feeling - 1] : null);
+        setPrivacy(response.data.privacy); // "Private" or "Couple"
+        console.log("Data: ",response.data)
       } else {
-        console.error('Error fetching diary data:', data);
+        console.error('Error fetching diary data:', response.data);
       }
     } catch (error) {
       console.error('Error fetching diary data:', error);
@@ -107,7 +104,8 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
     console.log("diaryDate : ",diaryData);
 
     try {
-      const response = await fetch('http://10.0.2.2:80/diary/edit-diary', {
+      const os = Platform.OS =='android' ? '10.0.2.2:80' : '127.0.0.1:80'
+      const response = await fetch(`http://${os}/diary/edit-diary`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(diaryData),

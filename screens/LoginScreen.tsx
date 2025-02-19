@@ -12,6 +12,14 @@ import LoginInputScreen from '../components/LoginInputScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { login, setFcm } from '../utils/apiClient';
 import messaging from '@react-native-firebase/messaging';
+import axios from 'axios';
+export const apiClient = axios.create({
+  //baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
+  baseURL: "http://127.0.0.1:80/", //IOS 에뮬레이터용
+  headers: {
+      "Content-Type": "application/json",
+  },
+});
 
 const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
   const [user, setUser] = useState(null);
@@ -91,16 +99,9 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
 
         // FCM 토큰 서버 저장
         if (fcmToken) {
-          const url = 'http://10.0.2.2:80/login/save-fcm-token';
-          await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              token: fcmToken
-            }),
-          });
+          await apiClient.post('/login/save-fcm-token',{
+            token: fcmToken,
+          })
         }
         navigation.reset({
           index: 0,

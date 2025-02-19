@@ -2,10 +2,10 @@
  * @format
  */
 
-import { AppRegistry } from 'react-native';
+import { AppRegistry, Platform } from 'react-native';
 import App from './App';
 import { name as appName } from './app.json';
-import notifee , { EventType }from '@notifee/react-native';
+import notifee, { EventType } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 
 // 백그라운드 메시지 핸들러
@@ -29,5 +29,12 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
       break;
   }
 });
+
+// Android에서만 Firebase 초기화
+if (Platform.OS === 'android') {
+  // Firebase 초기화 코드를 추가합니다.
+  // Firebase 설정 객체를 여기에 추가해야 합니다.
+  // 예: firebase.initializeApp({ ... });
+}
 
 AppRegistry.registerComponent(appName, () => App);

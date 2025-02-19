@@ -19,6 +19,7 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import { useFocusEffect } from '@react-navigation/native';
 import { fetchGroupId } from '../utils/apiClient';
+import { apiClient } from './LoginScreen';
 
 
 function generateCalender(year: number, month: number){
@@ -103,21 +104,14 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
                 const parsedUserInfo = JSON.parse(storedUserInfo);
                 setUserid(parsedUserInfo.id); // userInfo에서 id를 설정
             }
-            const response = await fetch(`http://10.0.2.2:80/home`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user_id: userid
-                }),
+            const response = await apiClient.post(`/home`, {
+                user_id: userid
             });
-            const json = await response.json();
-            if (json.success) {
-                console.log("Diary data received:", json.data); // 데이터 확인
-                setsmallDiary(json.data);
+            if (response.status === 200) {
+                console.log("Diary data received:", response.data); // 데이터 확인
+                setsmallDiary(response.data);
             } else {
-                console.error('API error:', json);
+                console.error('API error:', response.data);
                 setsmallDiary([]);
             }
         } catch (error) {

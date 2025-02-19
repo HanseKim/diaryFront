@@ -17,8 +17,17 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  Platform,
 } from 'react-native';
 import EditDiaryScreen from './EditDiaryScreen';
+import axios from 'axios';
+export const apiClient = axios.create({
+  //baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
+  baseURL: "http://127.0.0.1:80/", // ios
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 const setEmoteType = (emote: any) => {
   const emoteList = ['😞', '😠', '😐', '😊', '😄'];
@@ -105,20 +114,14 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
 
   const fetchUsers = async (userId: string, diaryDate: string) => {
     try {
-      const response = await fetch(`http://10.0.2.2:80/detail`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ user_id: userId, diary_date: diaryDate }),
-        }
-      );
-      const json = await response.json();
-      if (json.success) {
-        setDiary(json.data[0]);
+      const response = await apiClient.post(`/detail`,{ 
+        user_id: userId, 
+        diary_date: diaryDate 
+      });
+      if(response.status === 200) {
+        setDiary(response.data[0]);
       } else {
-        console.error('API error:', json);
+        console.error('API error:', response.data);
         setDiary(null);
       }
     } catch (error) {
