@@ -1,40 +1,40 @@
 /**
  * @format
  */
-
 import { AppRegistry, Platform } from 'react-native';
 import App from './App';
 import { name as appName } from './app.json';
 import notifee, { EventType } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
+import { RecoilRoot } from 'recoil';
 
-// 백그라운드 메시지 핸들러
+
+// Firebase 메시징 백그라운드 핸들러 설정
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-  console.log('백그라운드 메시지 수신:', remoteMessage);
+    console.log('Message handled in the background:', remoteMessage);
 });
 
-// Notifee 백그라운드 이벤트 핸들러
+// Notifee 백그라운드 이벤트 처리 설정
 notifee.onBackgroundEvent(async ({ type, detail }) => {
-  console.log('백그라운드 이벤트 발생:', { type, detail });
+    const eventHandlers = {
+        [EventType.PRESS]: () => {
+            console.log('Notification pressed in background:', detail.notification);
+        },
+        [EventType.ACTION_PRESS]: () => {
+            console.log('Action button pressed in background:', detail.pressAction);
+        },
+        default: () => {
+            console.log('Unknown background event type:', type);
+        }
+    };
 
-  switch (type) {
-    case EventType.PRESS:
-      console.log('백그라운드에서 알림 클릭:', detail.notification);
-      break;
-    case EventType.ACTION_PRESS:
-      console.log('백그라운드에서 작업 버튼 클릭:', detail.pressAction);
-      break;
-    default:
-      console.log('알 수 없는 백그라운드 이벤트 유형:', type);
-      break;
-  }
+    (eventHandlers[type] || eventHandlers.default)();
 });
 
-// Android에서만 Firebase 초기화
+// Android 플랫폼 특정 초기화
 if (Platform.OS === 'android') {
-  // Firebase 초기화 코드를 추가합니다.
-  // Firebase 설정 객체를 여기에 추가해야 합니다.
-  // 예: firebase.initializeApp({ ... });
+    // 추후 Android 특정 Firebase 설정이 필요할 경우 이곳에 추가
 }
 
+// 앱 등록
 AppRegistry.registerComponent(appName, () => App);

@@ -7,6 +7,7 @@
 
 import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   Image,
   Pressable,
@@ -21,6 +22,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AppContext } from "../contexts/appContext";
 import { fetchChatList, fetchGroupId, fetchCoupleCheck } from "../utils/apiClient";
 import { useFocusEffect } from "@react-navigation/native";
+import { refreshTriggerState } from '../store/recoilstate';
+import { useRecoilValue } from "recoil";
+
 
 type MessageProp = {
   id: string; user: string; text: string, date: string;
@@ -35,46 +39,59 @@ const ChatScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
 
 
   const { messages, setMessages } = appContext;
-  const [chats, setChats] = useState<MessageProp[]>([{ id: '', user: '', text: '', date: '' }]);
   const [cnt, setCnt] = useState<number>(0);
   const [gid, setGid] = useState<string>("");
   const [isGroup, setIsGroup] = useState<boolean>(false);
+  const refreshTrigger = useRecoilValue(refreshTriggerState);
+  async function loadchat() {
+    const isGroupResult = await fetchGroupId();
+    if (isGroupResult) {
+      setIsGroup(true);
+      const group_id = await AsyncStorage.getItem("groupid");
+      if (group_id !== null) {
+        setGid(group_id);
+      }
+      
+      const tmp = await AsyncStorage.getItem("chatdata");
+      if (tmp) {
+        console.log(tmp);
+        setMessages(JSON.parse(tmp));
+      } else {
+        console.log("empty");
+      }
+      
+      console.log("try fetch chat list");
 
+      const data = await fetchChatList();
+      //Alert.alert(JSON.stringify(data));
+      if (data["msg"].length > 0) {
+        setMessages((prev) => [...prev, ...data['msg']]);
+        setCnt(data["msg"].length);
+        //removeChat;
+      }
+      else {
+        console.log(data);
+        setCnt(0);
+      }
+      
+    }
+  }
+
+  
+  
   useFocusEffect(
     React.useCallback(() => {
-      async function loadchat() {
-        const isGroupResult = await fetchGroupId();
-        if (isGroupResult) {
-          setIsGroup(true);
-          const group_id = await AsyncStorage.getItem("groupid");
-          if (group_id !== null) {
-            setGid(group_id);
-          }
-          const tmp = await AsyncStorage.getItem("chatdata");
-          if (tmp) {
-            console.log(tmp);
-            setMessages(JSON.parse(tmp));
-          } else {
-            console.log("empty");
-          }
-          console.log("try fetch chat list");
-  
-          const data = await fetchChatList();
-          console.log(data);
-          if (data["msg"].length > 0) {
-            setMessages((prev) => [...prev, data['msg']]);
-            setCnt(data["msg"].length);
-            //removeChat;
-          }
-          else {
-            setCnt(0);
-          }
-        }
-      }
+      
       loadchat();
+
     }, [])
   );
 
+  useEffect(() => {
+    loadchat();
+  }, [refreshTrigger]);
+
+  
   return (
     <View style={styles.container}>
       {isGroup ?
@@ -119,6 +136,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+    marginTop: 50,
   },
   chatRoomContainer: {
     borderRadius: 8,

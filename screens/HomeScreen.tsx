@@ -18,8 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import { useFocusEffect } from '@react-navigation/native';
-import { fetchGroupId } from '../utils/apiClient';
-import { apiClient } from './LoginScreen';
+import { apiClient, fetchGroupId } from '../utils/apiClient';
 
 
 function generateCalender(year: number, month: number){
@@ -102,22 +101,25 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
             const storedUserInfo = await AsyncStorage.getItem("userInfo");
             if (storedUserInfo) {
                 const parsedUserInfo = JSON.parse(storedUserInfo);
-                setUserid(parsedUserInfo.id); // userInfo에서 id를 설정
+                setUserid(parsedUserInfo.id);
             }
+            
             const response = await apiClient.post(`/home`, {
                 user_id: userid
             });
-            if (response.status === 200) {
-                console.log("Diary data received:", response.data); // 데이터 확인
-                setsmallDiary(response.data);
+            
+            if (response.data.success) {
+                console.log("Diary data received:", response.data.data);
+                setsmallDiary(response.data.data);
             } else {
                 console.error('API error:', response.data);
                 setsmallDiary([]);
             }
         } catch (error) {
             console.error('Fetch error:', error);
+            setsmallDiary([]);
         }
-    }  
+    }
     useEffect(() => {
         getUserInfo();
     }, []); // 처음 한 번만 실행
@@ -132,7 +134,7 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
 
     return (
         <View style={{ flex: 1, alignItems: 'center', backgroundColor: 'white'}}>
-            <Image source={require('../images/logo.png')} style={{ width: '100%', height: '10%' }} />
+            <Image source={require('../images/logo.png')} style={{ width: '100%', height: '10%', marginTop:50}} />
             <View style={{ paddingTop:'3%', width: '100%',flex:1,  alignItems: 'center', backgroundColor: '#FADFEC', marginTop: '5%', borderRadius: 10, shadowOffset: { width: 0, height: 2 }, shadowColor: '#F5BFD9', shadowOpacity: 0.5, shadowRadius: 2 }}>
                 <View style={styles.headerContainer}>
                     <Text style={styles.headerText}>{monthName} {year}</Text>
@@ -283,7 +285,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
     dateText: {
-        width: '40%',
+        width: '50%',
         borderRadius: 3,
         fontSize: 14,
         fontFamily: 'Manrope',

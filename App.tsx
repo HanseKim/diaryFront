@@ -12,6 +12,8 @@ import MessageScreen from './screens/MessageScreen';
 import {WriteDiaryScreen} from './screens/WriteDiaryScreen';
 import EditDiaryScreen from './screens/EditDiaryScreen';
 import { setupForegroundNotificationListener } from './utils/notification';
+import { RecoilRoot } from 'recoil'; // RecoilRoot import 추가
+
 
 type RootStackParamList = {
   Login: undefined,
@@ -33,26 +35,29 @@ function App(): React.JSX.Element {
   }, []);
 
   return (
-    <AppProvider>
-      <NavigationContainer>
-      <Stack.Navigator 
-          initialRouteName="Login"
-          screenOptions={{
-            headerShown: false,  // 헤더 숨기기 추가
-            cardStyle: { backgroundColor: '#fff' }
-          }}
-        >
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Register" component={RegisterScreen} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-          <Stack.Screen name="Main" component={MainTabNavigator} />
-          <Stack.Screen name="Detail" component={DiaryDetailScreen} />
-          <Stack.Screen name="Message" component={MessageScreen} />
-          <Stack.Screen name="WriteDiaryScreen" component={WriteDiaryScreen} />
-          <Stack.Screen name="EditDiaryScreen" component={EditDiaryScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </AppProvider>
+    <RecoilRoot>
+      <AppProvider>
+        <NavigationContainer>
+        <Stack.Navigator 
+            initialRouteName="Login"
+            screenOptions={{
+              headerShown: false,  // 헤더 숨기기 추가
+              cardStyle: { backgroundColor: '#fff' }
+            }}
+          >
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerTitle: '' }} />
+            <Stack.Screen name="Detail" component={DiaryDetailScreen} />
+            <Stack.Screen name="Message" component={MessageScreen} />
+            <Stack.Screen name="WriteDiaryScreen" component={WriteDiaryScreen} />
+            <Stack.Screen name="EditDiaryScreen" component={EditDiaryScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </AppProvider>
+    </RecoilRoot>
+    
   );
 }
 

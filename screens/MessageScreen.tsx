@@ -37,8 +37,7 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
 
   const { token, groupid, userid } = route.params;
 
-  const os = Platform.OS =='android' ? '10.0.2.2:80' : '127.0.0.1:80';
-  const socket = io(`http://${os}/`, {
+  const socket = io("http://10.0.2.2:80/", {
     auth: {
       token, // 서버로 토큰 전달
     },
@@ -76,7 +75,7 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
   });
 
   socket.on("new msg set", (data, uid) => {
-    Alert.alert("new message set => send id : " , uid);
+    //Alert.alert("new message set");
     console.log("from chat data : ", data);
     if (uid === userid) {
     }
@@ -132,7 +131,9 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
     if (message.trim()) {
       const now = moment();
       const newMessage = { id: Date.now().toString(), user: userid, text: message, date: now.format('YY-MM-DD HH:mm') };
-      socket.emit("new message", newMessage, groupid); // 메시지 서버로 전송
+      const storedUserInfo = await AsyncStorage.getItem("userInfo");
+      const info = JSON.parse(String(storedUserInfo)).nickname;
+      socket.emit("new message", newMessage, groupid, info); // 메시지 서버로 전송
       setMessages((prevMessages) => [...prevMessages, newMessage]);
 
       setMessage("");

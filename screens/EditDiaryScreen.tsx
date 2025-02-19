@@ -14,17 +14,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  Platform,
 } from 'react-native';
 import axios from 'axios';
-
-export const apiClient = axios.create({
-  //baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
-  baseURL: "http://127.0.0.1:80/", // ios
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+import { apiClient } from '../utils/apiClient';
 
 const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
   const { diaryId } = route.params; // 이전 화면에서 전달받은 diaryId
@@ -39,13 +31,11 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
   // 백엔드에서 일기 데이터 가져오기
   const fetchDiaryData = async () => {
     try {
-      console.log(diaryId);
-
-      const response = await apiClient.post(`/diary/edit-search`, {
-        id: diaryId,
-      });
-
-      if(response.status === 200) {
+        console.log(diaryId);
+        const response = await apiClient.post(`/diary/edit-search`, {
+          id: diaryId,
+        });
+      if(response.data){
         setDate(new Date(response.data.diary_date));
         setDay(response.data.diary_date);
         setHeadline(response.data.title);
@@ -101,17 +91,14 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
       privacy: privacy,
       diary_date: day,
     };
-    console.log("diaryDate : ",diaryData);
-
-    try {
-      const os = Platform.OS =='android' ? '10.0.2.2:80' : '127.0.0.1:80'
-      const response = await fetch(`http://${os}/diary/edit-diary`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(diaryData),
-      });
+    console.log("diaryData : ", diaryData);
   
-      const data = await response.json();
+    try {
+      const response = await apiClient.post('/diary/edit-diary', diaryData);
+  
+      console.log("API Response:", response); // 추가된 로그
+      const data = response.data; // response.data를 직접 가져오기
+  
       if (data) {
         navigation.navigate('Detail', {
           clickdate: date.getDate(),
@@ -128,13 +115,12 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
   };
   
 
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-          <Text style={styles.Text} onPress={handlePrevDate}>◀</Text>
+          {/* <Text style={styles.Text} onPress={handlePrevDate}>◀</Text> */}
           <Text style={styles.dateText}>{formatDate(date)}</Text>
-          <Text style={styles.Text} onPress={handleNextDate}>▶</Text>
+          {/* <Text style={styles.Text} onPress={handleNextDate}>▶</Text> */}
       </View>
       <View style={{marginBottom: 15,
         padding: 10,
@@ -283,7 +269,8 @@ const styles = StyleSheet.create({
       padding: 12,
       borderRadius: 8,
       fontSize: 16,
-      borderBottomWidth: 1,
+      borderBottomWidth: 0.5,
+      borderBottomColor : 'lightgray'
   },
   inputContent: {
       backgroundColor: '#FFF',

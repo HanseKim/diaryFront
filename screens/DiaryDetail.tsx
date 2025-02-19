@@ -17,17 +17,9 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  Platform,
 } from 'react-native';
 import EditDiaryScreen from './EditDiaryScreen';
-import axios from 'axios';
-export const apiClient = axios.create({
-  //baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
-  baseURL: "http://127.0.0.1:80/", // ios
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+import { apiClient } from '../utils/apiClient';
 
 const setEmoteType = (emote: any) => {
   const emoteList = ['😞', '😠', '😐', '😊', '😄'];
@@ -114,14 +106,14 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
 
   const fetchUsers = async (userId: string, diaryDate: string) => {
     try {
-      const response = await apiClient.post(`/detail`,{ 
-        user_id: userId, 
-        diary_date: diaryDate 
-      });
-      if(response.status === 200) {
-        setDiary(response.data[0]);
+      const response = await apiClient.post(`/detail`,
+        { user_id: userId, diary_date: diaryDate }
+      );
+      const json = await response.data;
+      if (json.success) {
+        setDiary(json.data[0]);
       } else {
-        console.error('API error:', response.data);
+        console.error('API error:', json);
         setDiary(null);
       }
     } catch (error) {
@@ -222,7 +214,7 @@ const styles = StyleSheet.create({
       width: 5,
       height: 8,
     },
-    shadowOpacity: 1,
+    shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 8,
     alignItems: 'center',
@@ -247,6 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 50, // ios 에서 안보임
   },
   spaceBetween: {
     justifyContent: 'space-between',

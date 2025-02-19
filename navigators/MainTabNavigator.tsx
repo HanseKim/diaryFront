@@ -37,6 +37,7 @@ function MainTabNavigator(): React.JSX.Element {
   return (
       <BottomTab.Navigator
         screenOptions={{
+          headerShown: false, 
           tabBarActiveTintColor: "#F5BFD9", // 활성화 상태의 텍스트 및 아이콘 색상
           tabBarInactiveTintColor: "#999", // 비활성화 상태의 텍스트 및 아이콘 색상
           tabBarStyle: { backgroundColor: "#fff", height: "8%" }, // 탭 바 배경색, 높이

@@ -12,14 +12,6 @@ import LoginInputScreen from '../components/LoginInputScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { login, setFcm } from '../utils/apiClient';
 import messaging from '@react-native-firebase/messaging';
-import axios from 'axios';
-export const apiClient = axios.create({
-  //baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
-  baseURL: "http://127.0.0.1:80/", //IOS 에뮬레이터용
-  headers: {
-      "Content-Type": "application/json",
-  },
-});
 
 const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
   const [user, setUser] = useState(null);
@@ -27,18 +19,27 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
   // FCM 토큰 가져오기 함수
   async function getFCMToken() {
     try {
-      const authStatus = await messaging().requestPermission();
-      const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+        // 먼저 디바이스를 원격 메시지용으로 등록
+        await messaging().registerDeviceForRemoteMessages();
+        
+        // 그 다음 권한 요청
+        const authStatus = await messaging().requestPermission();
+        const enabled =
+            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+            authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-      if (enabled) {
-        const token = await messaging().getToken();
-        console.log('FCM Token:', token);
-        return token;
-      }
+        if (enabled) {
+            // 권한이 있는 경우에만 토큰 요청
+            const token = await messaging().getToken();
+            console.log('FCM Token received:', token);
+            return token;
+        } else {
+            console.log('FCM permission denied');
+            return null;
+        }
     } catch (error) {
-      console.error('FCM token error:', error);
+        console.error('FCM token error:', error);
+        return null;
     }
   }
 
@@ -79,46 +80,44 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
     }
   };
 
-
-
-
   // 로그인 처리 함수
   const handleLogin = async (id: string, password: string) => {
     try {
-      const loginResult = await login(id, password);
-      console.log("Login API Result:", loginResult);
-
-      // loginResult와 token이 있는지 확인
-      // 로그인 성공 여부 체크
-      if (!loginResult) {
-        throw new Error('Login response is invalid');
-      }
-      else {
-
-        const fcmToken = await getFCMToken();
-
-        // FCM 토큰 서버 저장
-        if (fcmToken) {
-          await apiClient.post('/login/save-fcm-token',{
-            token: fcmToken,
-          })
+        const loginResult = await login(id, password);
+        
+        if (!loginResult) {
+            throw new Error('Login response is invalid');
         }
+        
+        // FCM 토큰 획득 및 서버 저장
+        const fcmToken = await getFCMToken();
+        if (fcmToken) {
+            try {
+                await setFcm(fcmToken);
+                console.log('FCM token successfully saved to server');
+            } catch (fcmError) {
+                console.error('Failed to save FCM token:', fcmError);
+                // FCM 토큰 저장 실패는 로그인 진행에 영향을 주지 않도록 함
+            }
+        }
+
+        // 네비게이션은 한 번만 실행
         navigation.reset({
-          index: 0,
-          routes: [{ name: 'Main' }],
+            index: 0,
+            routes: [{ name: 'Main' }],
         });
-      }
+        
     } catch (error: any) {
-      console.error("Login failed:", error);
-      if (error.status === 401) {
-        Alert.alert("로그인 실패", "비밀번호가 일치하지 않습니다.");
-      } else if (error.status === 404) {
-        Alert.alert("로그인 실패", "해당 아이디의 유저가 없습니다.");
-      } else {
-        Alert.alert("오류", "로그인 중 문제가 발생했습니다.");
-      }
+        console.error("Login failed:", error);
+        if (error.status === 401) {
+            Alert.alert("로그인 실패", "비밀번호가 일치하지 않습니다.");
+        } else if (error.status === 404) {
+            Alert.alert("로그인 실패", "해당 아이디의 유저가 없습니다.");
+        } else {
+            Alert.alert("오류", "로그인 중 문제가 발생했습니다.");
+        }
     }
-  };
+};
 
   const goRegister = () => {
     navigation.reset({
