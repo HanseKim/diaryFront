@@ -19,11 +19,11 @@ type InfoComponentProps = {
 const InfoComponent:React.FC<InfoComponentProps> = ({name,month_diary,all_diary,diarycount,handleModal,daysPassed}) => {
   const mood = ['sad','angry','normal','smile','happy'];
   const moodImages: { [key: string]: any } = {
-    sad: require("../images/sad.png"),
-    angry: require("../images/angry.png"),
-    normal: require("../images/normal.png"),
-    smile: require("../images/smile.png"),
-    happy: require("../images/happy.png"),
+    sad: require("../images/myFace/sad.png"),
+    angry: require("../images/myFace/angry.png"),
+    normal: require("../images/myFace/normal.png"),
+    smile: require("../images/myFace/smile.png"),
+    happy: require("../images/myFace/happy.png"),
   };
 
   return (

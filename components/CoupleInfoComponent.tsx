@@ -52,11 +52,11 @@ const CoupleInfoComponent:React.FC<CoupleInfoComponentProps> = ({name,daysPassed
   
   const mood = ['sad','angry','normal','smile','happy'];
   const moodImages: { [key: string]: any } = {
-    sad: require("../images/sad.png"),
-    angry: require("../images/angry.png"),
-    normal: require("../images/normal.png"),
-    smile: require("../images/smile.png"),
-    happy: require("../images/happy.png"),
+    sad: require("../images/CoupleFace/sad.png"),
+    angry: require("../images/CoupleFace/angry.png"),
+    normal: require("../images/CoupleFace/normal.png"),
+    smile: require("../images/CoupleFace/smile.png"),
+    happy: require("../images/CoupleFace/happy.png"),
   };
 
   return (

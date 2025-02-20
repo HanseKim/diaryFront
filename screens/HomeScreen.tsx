@@ -19,6 +19,17 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import { useFocusEffect } from '@react-navigation/native';
 import { apiClient, fetchGroupId } from '../utils/apiClient';
+const angry = require('../images/myFace/angry.png');
+const sad = require('../images/myFace/sad.png');
+const neutral = require('../images/myFace/normal.png');
+const happy = require('../images/myFace/smile.png');
+const veryhappy = require('../images/myFace/happy.png');
+
+const angry2 = require('../images/CoupleFace/angry.png');
+const sad2 = require('../images/CoupleFace/sad.png');
+const neutral2 = require('../images/CoupleFace/normal.png');
+const happy2 = require('../images/CoupleFace/smile.png');
+const veryhappy2 = require('../images/CoupleFace/happy.png');
 
 
 function generateCalender(year: number, month: number){
@@ -56,10 +67,39 @@ const setMonthName = (month: number) => {
     return monthNames[month];
 }
 
-const setEmoteType = (emote: number) => {
-    const emoteList = ['😞', '😠', '😐', '😊', '😄'];
-    return emoteList[emote-1];
+const setMyEmoteType = (emote: number) => {
+    switch(emote) {
+        case 1:
+            return sad;
+        case 2:
+            return angry;
+        case 3:
+            return neutral;
+        case 4:
+            return happy;
+        case 5:
+            return veryhappy;
+        default:
+            return null;
+    }
 }
+const setCoupleEmoteType = (emote: number) => {
+    switch(emote) {
+        case 1:
+            return sad2;
+        case 2:
+            return angry2;
+        case 3:
+            return neutral2;
+        case 4:
+            return happy2;
+        case 5:
+            return veryhappy2;
+        default:
+            return null;
+    }
+}
+
 const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
 const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
@@ -69,6 +109,8 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
     const month = currentDate.getMonth();
     const year = currentDate.getFullYear();
     const [smalldiary, setsmallDiary] = useState<any[]>([]);
+    const [coupleName, setCoupleName] = useState<string>('');
+    const [couplediary, setCoupleDiary] = useState<any[]>([]);
     
     const calendarMatrix = generateCalender(year, month);
     const monthName = setMonthName(month);
@@ -96,6 +138,31 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
             console.error("Error retrieving user info:", error);
         }
     };
+    async function fetchCoupleId() {
+        try {
+            const storedUserInfo = await AsyncStorage.getItem("userInfo");
+            if (storedUserInfo) {
+                const parsedUserInfo = JSON.parse(storedUserInfo);
+                setUserid(parsedUserInfo.id);
+            }
+            
+            const response = await apiClient.post(`/home/coupleName`, {
+                user_id: userid
+            });
+            
+            if (response.data.success) {
+                console.log("Couple data received:", response.data.data);
+                setCoupleName(response.data.data);
+            } else {
+                console.error('API error:', response.data);
+                setCoupleName('');
+            }
+        }
+        catch (error) {
+            console.error('Fetch error:', error);
+            setCoupleName('');
+        }
+    }
     async function fetchUsers() {
         try {
             const storedUserInfo = await AsyncStorage.getItem("userInfo");
@@ -120,14 +187,31 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
             setsmallDiary([]);
         }
     }
+    const fetchCoupleDiary = async () => {
+        try {
+            const response = await apiClient.post(`/home/couplediary`, {
+                user_id: userid
+            });
+            if (response.data.success) {
+                console.log("Diary data received:", response.data.data);
+                setCoupleDiary(response.data.data);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+            setCoupleDiary([]);
+        }
+    }
+
     useEffect(() => {
         getUserInfo();
     }, []); // 처음 한 번만 실행
     
     useFocusEffect(
-        React.useCallback(() => {
+        React.useCallback(() =>  {
             if (userid) {  // userid가 있을 때만 실행
                 fetchUsers();
+                fetchCoupleId();
+                fetchCoupleDiary();
             }
         }, [userid]) // userid 변경 시에만 실행
     );
@@ -177,38 +261,73 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
                             let matchedDiary = smalldiary?.find((item: { diary_date: string | number | Date; }) => {
                                 const d = new Date(item.diary_date);
                                 return (
-                                d.getFullYear() === year &&
-                                d.getMonth() === month &&
-                                d.getDate() === date
+                                    d.getFullYear() === year &&
+                                    d.getMonth() === month &&
+                                    d.getDate() === date
                                 );
                             });
-                            const emoteToday = setEmoteType(matchedDiary?.feeling);
+                            let coupleDiary = couplediary?.find((item: { diary_date: string | number | Date; }) => {
+                                const d = new Date(item.diary_date);
+                                return (
+                                    d.getFullYear() === year &&
+                                    d.getMonth() === month &&
+                                    d.getDate() === date
+                                );
+                            });
+                            const emoteToday = setMyEmoteType(matchedDiary?.feeling);
+                            const emoteCouple = setCoupleEmoteType(coupleDiary?.feeling);
                             return (
                                 <View style={[styles.dateBox, {borderColor: borderColor, borderWidth: 4}]} key={colIndex}>
                                     {date ? (
-                                        <TouchableOpacity onPress={() => navigation.navigate('Detail', {clickdate: date, clickmonth: month, clickyear: year, userid : userid})} 
-                                            style={{height:'100%'}}
+                                        <View style={{height:'100%'}}
                                             // key={colIndex}
                                             >
                                             <Text style={[styles.dateText, { color: textColor}]}>
                                                 {date}
                                             </Text>
+                                            <View style={{flex:1, flexDirection: 'column', justifyContent: 'space-around', alignItems:'center'}}>
                                             {matchedDiary ? (
                                                 <>
-                                                <Text>
-                                                    {emoteToday}
-                                                </Text>
-                                                <Text 
-                                                    numberOfLines={2}
-                                                    ellipsizeMode="tail"
-                                                    style={{}}
-                                                >
-                                                    {matchedDiary?.title}
-                                                </Text></>
+                                                    <TouchableOpacity 
+                                                        onPress={() => navigation.navigate('Detail', {
+                                                            clickdate: date, 
+                                                            clickmonth: month, 
+                                                            clickyear: year, 
+                                                            userid : userid
+                                                        })} 
+                                                        style={{flex:0.4, justifyContent: 'center', alignItems: 'center'}}>
+                                                        <Image 
+                                                            source={emoteToday} 
+                                                            style={{width: 30, height: 30}}
+                                                            resizeMode="contain"
+                                                        />
+                                                    </TouchableOpacity>
+                                                </> 
                                             ) : (
-                                                null
+                                                <View style={{flex:0.4}}/>
                                             )}
-                                        </TouchableOpacity>
+                                            {coupleDiary ? (
+                                                <>
+                                                    <TouchableOpacity 
+                                                        onPress={() => navigation.navigate('Detail', {
+                                                            clickdate: date, 
+                                                            clickmonth: month, 
+                                                            clickyear: year, 
+                                                            userid : coupleName
+                                                        })} 
+                                                        style={{flex:0.4, justifyContent: 'center', alignItems: 'center'}}>
+                                                        <Image 
+                                                            source={emoteCouple} 
+                                                            style={{width: 30, height: 30}}
+                                                            resizeMode="contain"
+                                                        />
+                                                    </TouchableOpacity>
+                                                </> 
+                                            ) : (
+                                                <View style={{flex:0.4}}/>
+                                            )}
+                                            </View>
+                                        </View>
                                     ) : (
                                         <View style={styles.dateText}/>
                                     )}

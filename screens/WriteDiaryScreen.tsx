@@ -7,12 +7,20 @@ import {
     TouchableOpacity,
     StyleSheet,
     Alert,
-    Platform
+    Platform,
+    Image
 } from 'react-native';
 
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '../utils/apiClient';
+// 이모티콘 이미지 import (myFace 폴더 내 이미지)
+const angry = require('../images/myFace/angry.png');
+const sad = require('../images/myFace/sad.png');
+const neutral = require('../images/myFace/normal.png');
+const happy = require('../images/myFace/smile.png');
+const veryhappy = require('../images/myFace/happy.png');
+
 
 
 const PreDiaryQuestionsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -181,6 +189,14 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
             Alert.alert('Failed to save diary data');
         }
     };    
+    const moodOptions = [
+        { value: '😞', image: sad },
+        { value: '😠', image: angry },
+        { value: '😐', image: neutral },
+        { value: '😊', image: happy },
+        { value: '😄', image: veryhappy },
+    ];
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -205,6 +221,7 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
                     style={styles.inputHeadline}
                     placeholder="Headline"
                     value={headline}
+                    placeholderTextColor="#F6A5C0" 
                     onChangeText={setHeadline}
                 />
 
@@ -212,19 +229,27 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
                     style={styles.inputContent}
                     placeholder="Start typing..."
                     value={content}
+                    placeholderTextColor="#F6A5C0" 
                     onChangeText={setContent}
                     multiline
                 />
             </View>
         
             <View style={styles.moodContainer}>
-                {['😞', '😠', '😐', '😊', '😄'].map((emoji, index) => (
+                {moodOptions.map((option, index) => (
                     <TouchableOpacity
                         key={index}
-                        style={[styles.moodButton, mood === emoji && styles.moodButtonSelected]}
-                        onPress={() => setMood(emoji)}
+                        style={[
+                        styles.moodButton,
+                        mood === option.value && styles.moodButtonSelected,
+                        ]}
+                        onPress={() => setMood(option.value)}
                     >
-                        <Text style={styles.moodText}>{emoji}</Text>
+                        <Image
+                        source={option.image}
+                        style={{ width: 40, height: 40 }}
+                        resizeMode="contain"
+                        />
                     </TouchableOpacity>
                 ))}
             </View>
@@ -350,8 +375,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         minHeight: 300,
         textAlignVertical: 'top',
-        borderTopWidth : 1,
-        borderTopColor: 'gray',
         marginBottom: 16,
     },
     moodContainer: {
@@ -363,8 +386,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         shadowColor: '#FF5C85',
         shadowOffset: {
-        width: 8,
-        height: 8,
+            width: 8,
+            height: 8,
         },
         shadowOpacity: 0.2,
         shadowRadius: 10,

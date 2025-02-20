@@ -21,12 +21,12 @@ interface DiaryEntry {
   content: string;
 }
 
-const feelingMap: { [key: number]: string } = {
-  1: '😞',
-  2: '😠',
-  3: '😐',
-  4: '😊',
-  5: '😄',
+const feelingMap: { [key: number]: any } = {
+  1: require('../images/myFace/angry.png'),
+  2: require('../images/myFace/sad.png'),
+  3: require('../images/myFace/normal.png'),
+  4: require('../images/myFace/smile.png'),
+  5: require('../images/myFace/happy.png'),
 };
 
 const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -126,7 +126,11 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             onPress={() => handleItemPress(item)}
           >
             <View style={styles.resultContent}>
-              <Text style={styles.resultMood}>{feelingMap[item.feeling]}</Text>
+            <Image 
+              source={feelingMap[item.feeling]} 
+              style={styles.resultMood}
+              resizeMode="contain"
+            />
               <View>
                 <Text style={styles.resultDate}>{item.diary_date}</Text>
                 <Text style={styles.resultHeadline}>{item.title}</Text>
@@ -200,7 +204,8 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   resultMood: {
-    fontSize: 24,
+    width: 40,
+    height: 40,
     marginRight: 15,
   },
   resultDate: {

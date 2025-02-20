@@ -20,11 +20,50 @@ import {
 } from 'react-native';
 import EditDiaryScreen from './EditDiaryScreen';
 import { apiClient } from '../utils/apiClient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const angry = require('../images/myFace/angry.png');
+const sad = require('../images/myFace/sad.png');
+const neutral = require('../images/myFace/normal.png');
+const happy = require('../images/myFace/smile.png');
+const veryhappy = require('../images/myFace/happy.png');
 
-const setEmoteType = (emote: any) => {
-  const emoteList = ['😞', '😠', '😐', '😊', '😄'];
+const angry2 = require('../images/CoupleFace/angry.png');
+const sad2 = require('../images/CoupleFace/sad.png');
+const neutral2 = require('../images/CoupleFace/normal.png');
+const happy2 = require('../images/CoupleFace/smile.png');
+const veryhappy2 = require('../images/CoupleFace/happy.png');
 
-  return emoteList[emote-1];
+const setEmoteType = (emote: number | undefined) => {
+  switch(emote) {
+      case 1:
+          return sad;
+      case 2:
+          return angry;
+      case 3:
+          return neutral;
+      case 4:
+          return happy;
+      case 5:
+          return veryhappy;
+      default:
+          return null;
+  }
+}
+const setCoupleEmoteType = (emote: number | undefined) => {
+  switch(emote) {
+      case 1:
+          return sad2;
+      case 2:
+          return angry2;
+      case 3:
+          return neutral2;
+      case 4:
+          return happy2;
+      case 5:
+          return veryhappy2;
+      default:
+          return null;
+  }
 }
 
 const setMonthName = (month: number) => {
@@ -52,7 +91,10 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
   const now = new Date().getDate();
   const nowMonth = new Date().getMonth();
   const emoteToday = setEmoteType(diary?.feeling);
+  const emoteCouple = setCoupleEmoteType(diary?.feeling);
+  
   const monthName = setMonthName(clickmonth);
+  const [currentUserId, setCurrentUserId] = useState<string>('');
   
   const formatDate = (year: number, month: number, day: number) => {
     const formattedMonth = (month + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1
@@ -62,6 +104,19 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
   
   useFocusEffect(
     React.useCallback(() => {
+      const getCurrentUserId = async () => {
+        try {
+          const storedUserId = await AsyncStorage.getItem("userid");
+          if (storedUserId) {
+            setCurrentUserId(storedUserId);
+          }
+        } catch (error) {
+          console.error('Error fetching current user ID:', error);
+        }
+      };
+      
+      getCurrentUserId();
+      
       const diary_date = formatDate(year, month, date);
       console.log(diary_date);
       fetchUsers(userid, diary_date);
@@ -144,21 +199,34 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
 
         <View style={{width: '100%', height: '12%'}}>
           <View style={{flexDirection:'row', width: '100%', height: '50%', marginTop:20, justifyContent:'space-between'}}>
-            <Text style={{width: '20%',height:'100%', textAlign: 'center', fontSize: 30}}>{emoteToday}</Text>
             {
-              diary?.id ? (
-              <TouchableOpacity 
-                onPress={() => navigation.navigate('EditDiaryScreen', {diaryId: diary?.id } )} 
-                style={{
-                  width:'17%',
-                  height: '100%', 
-                  marginRight: 30,
-                  alignItems: 'flex-end', 
-                  justifyContent: 'center'
-                }}>
-                <Text style={{fontSize: 16, width: '100%', textAlign: 'right'}}>edit</Text>
-              </TouchableOpacity>) 
-              :(<></>)
+              diary?.id && currentUserId === userid  ? (
+                <>
+                  <Image 
+                    source={emoteToday} 
+                    style={{width: '20%',height:'100%', resizeMode:'contain'}}
+                    resizeMode="contain"
+                  />
+                  <TouchableOpacity 
+                    onPress={() => navigation.navigate('EditDiaryScreen', {diaryId: diary?.id } )} 
+                    style={{
+                      width:'17%',
+                      height: '100%', 
+                      marginRight: 30,
+                      alignItems: 'flex-end', 
+                      justifyContent: 'center'
+                    }}>
+                    <Text style={{fontSize: 16, width: '100%', textAlign: 'right'}}>edit</Text>
+                  </TouchableOpacity>
+                </>
+            ) 
+              :(<>
+                  <Image 
+                    source={emoteCouple} 
+                    style={{width: '20%',height:'100%', resizeMode:'contain'}}
+                    resizeMode="contain"
+                  />
+                </>)
             }
             
           </View>
