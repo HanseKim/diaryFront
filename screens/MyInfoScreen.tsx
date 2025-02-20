@@ -13,7 +13,6 @@ import UserModal from '../components/UserModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '../utils/apiClient';
 import * as Animatable from 'react-native-animatable';
-import { createNativeWrapper } from 'react-native-gesture-handler';
 
 const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
   const [modal, setModal] = useState<number>(0);
@@ -27,14 +26,28 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
   const handleModal = (modal_num: number) => setModal(modal_num);
   const handleLogout = async () => {
     try {
-      // AsyncStorage에서 userInfo와 토큰 삭제
-      await AsyncStorage.removeItem("userInfo");
-      await AsyncStorage.removeItem("userid");
-      await AsyncStorage.removeItem("userpwd");
-      await AsyncStorage.removeItem("jwtToken"); // 토큰 키 이름에 따라 변경
+      Alert.alert(
+        "로그아웃을 하시면 채팅데이터가 삭제됩니다.", // 제목
+        "진행하시겠습니까?", // 내용
+        [
+          {
+            text: "아니오",
+            onPress: () => {},
+            style: "cancel",
+          },
+          {
+            text: "예",
+            onPress: async() => {
+              await AsyncStorage.multiRemove(["userInfo", "userid", "userpwd", "jwtToken", "chatdata", "groupid"]);
   
-      // 로그인 화면으로 이동
-      navigation.navigate('Login'); // 로그인 화면의 이름에 따라 변경
+              // 로그인 화면으로 이동
+              navigation.navigate('Login');},
+          },
+        ],
+        { cancelable: false } // Alert 바깥을 눌러도 닫히지 않도록 설정
+      );
+      //로그아웃시 로컬 데이터 전부 삭제
+       // 로그인 화면의 이름에 따라 변경
     } catch (error) {
       console.error("Error during logout:", error);
       Alert.alert("오류", "로그아웃 중 문제가 발생했습니다.");

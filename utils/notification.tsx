@@ -72,6 +72,7 @@ export const useFCMListener = () => {
 
   return null;
 };
+
 //포그라운드 알림
 export function setupForegroundNotificationListener() {
   messaging().onMessage(async remoteMessage => {
@@ -135,7 +136,7 @@ export async function requestFCMPermission() {
         .catch(e => console.log('error: ', e));
     }
 }
-
+/*
 export async function scheduleDailyNotification() {
   try {
     // 채널 생성 확인
@@ -176,7 +177,7 @@ export async function scheduleDailyNotification() {
   } catch (error) {
     console.error('Error scheduling notification:', error);
   }
-}
+}*/
 
 // initializeNotifications 함수를 수정합니다
 export async function initializeNotifications() {
@@ -184,8 +185,7 @@ export async function initializeNotifications() {
   await requestFCMPermission();
   
   // 일일 알림 스케줄 설정
-  await scheduleDailyNotification();
-  onDisplayNotification('이거나 먹어라', '개쉐이들아');
+  //await scheduleDailyNotification();
 }
 
 // 즉시 알림 표시

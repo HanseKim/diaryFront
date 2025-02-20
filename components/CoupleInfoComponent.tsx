@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { apiClient } from '../utils/apiClient';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type CoupleInfoComponentProps = {
   name : string
@@ -21,7 +22,7 @@ const CoupleInfoComponent:React.FC<CoupleInfoComponentProps> = ({name,daysPassed
   const handleDeleteCouple = () => {
     Alert.alert(
       "커플 삭제",
-      "정말 커플 관계를 삭제하시겠습니까?",
+      "채팅도 삭제됩니다. 정말 커플 관계를 삭제하시겠습니까?",
       [
         {
           text: "취소",
@@ -33,6 +34,8 @@ const CoupleInfoComponent:React.FC<CoupleInfoComponentProps> = ({name,daysPassed
           onPress: async () => {
             try {
               const response = await apiClient.post("/mypage/delete-couple");
+              await AsyncStorage.removeItem("groupid");
+              await AsyncStorage.removeItem("chatdata");
               if (response.data.success) {
                 Alert.alert("성공", "커플 관계가 삭제되었습니다.");
                 onDeleteSuccess(); 

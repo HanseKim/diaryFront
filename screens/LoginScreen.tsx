@@ -19,39 +19,39 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
   // FCM 토큰 가져오기 함수
   async function getFCMToken() {
     try {
-        // 먼저 디바이스를 원격 메시지용으로 등록
-        await messaging().registerDeviceForRemoteMessages();
-        
-        // 그 다음 권한 요청
-        const authStatus = await messaging().requestPermission();
-        const enabled =
-            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-            authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      // 먼저 디바이스를 원격 메시지용으로 등록
+      await messaging().registerDeviceForRemoteMessages();
 
-        if (enabled) {
-            // 권한이 있는 경우에만 토큰 요청
-            const token = await messaging().getToken();
-            console.log('FCM Token received:', token);
-            return token;
-        } else {
-            console.log('FCM permission denied');
-            return null;
-        }
-    } catch (error) {
-        console.error('FCM token error:', error);
+      // 그 다음 권한 요청
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (enabled) {
+        // 권한이 있는 경우에만 토큰 요청
+        const token = await messaging().getToken();
+        console.log('FCM Token received:', token);
+        return token;
+      } else {
+        console.log('FCM permission denied');
         return null;
+      }
+    } catch (error) {
+      console.error('FCM token error:', error);
+      return null;
     }
   }
 
   // 자동 로그인 체크
   const checkAutoLogin = async () => {
-    console.log("자동 로그인 중");
+    //console.log("자동 로그인 중");
     const uid = await AsyncStorage.getItem("userid");
     const upwd = await AsyncStorage.getItem("userpwd");
     try {
       if (uid != null && upwd != null) {
         const loginResult = await login(uid, upwd);
-        console.log("Login API Result:", loginResult);
+        //console.log("Login API Result:", loginResult);
 
         // loginResult와 token이 있는지 확인
         // 로그인 성공 여부 체크
@@ -60,14 +60,19 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
           throw new Error('Login response is invalid');
         }
         else {
-          
-          const fcmToken = await getFCMToken();
 
-          // FCM 토큰 서버 저장
+          const fcmToken = await getFCMToken();
+          //Alert.alert(String(fcmToken));
           if (fcmToken) {
-            setFcm(fcmToken);
+            try {
+              await setFcm(fcmToken);
+              //console.log('FCM token successfully saved to server');
+            } catch (fcmError) {
+              console.error('Failed to save FCM token:', fcmError);
+              // FCM 토큰 저장 실패는 로그인 진행에 영향을 주지 않도록 함
+            }
           }
-            
+
           navigation.reset({
             index: 0,
             routes: [{ name: 'Main' }],
@@ -83,41 +88,43 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
   // 로그인 처리 함수
   const handleLogin = async (id: string, password: string) => {
     try {
-        const loginResult = await login(id, password);
-        
-        if (!loginResult) {
-            throw new Error('Login response is invalid');
-        }
-        
-        // FCM 토큰 획득 및 서버 저장
-        const fcmToken = await getFCMToken();
-        if (fcmToken) {
-            try {
-                await setFcm(fcmToken);
-                console.log('FCM token successfully saved to server');
-            } catch (fcmError) {
-                console.error('Failed to save FCM token:', fcmError);
-                // FCM 토큰 저장 실패는 로그인 진행에 영향을 주지 않도록 함
-            }
-        }
+      const loginResult = await login(id, password);
 
-        // 네비게이션은 한 번만 실행
-        navigation.reset({
-            index: 0,
-            routes: [{ name: 'Main' }],
-        });
-        
-    } catch (error: any) {
-        console.error("Login failed:", error);
-        if (error.status === 401) {
-            Alert.alert("로그인 실패", "비밀번호가 일치하지 않습니다.");
-        } else if (error.status === 404) {
-            Alert.alert("로그인 실패", "해당 아이디의 유저가 없습니다.");
-        } else {
-            Alert.alert("오류", "로그인 중 문제가 발생했습니다.");
+      if (!loginResult) {
+        throw new Error('Login response is invalid');
+      }
+
+      // FCM 토큰 획득 및 서버 저장
+      const fcmToken = await getFCMToken();
+      //Alert.alert(String(fcmToken));
+
+      if (fcmToken) {
+        try {
+          await setFcm(fcmToken);
+          //console.log('FCM token successfully saved to server');
+        } catch (fcmError) {
+          console.error('Failed to save FCM token:', fcmError);
+          // FCM 토큰 저장 실패는 로그인 진행에 영향을 주지 않도록 함
         }
+      }
+
+      // 네비게이션은 한 번만 실행
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Main' }],
+      });
+
+    } catch (error: any) {
+      console.error("Login failed:", error);
+      if (error.status === 401) {
+        Alert.alert("로그인 실패", "비밀번호가 일치하지 않습니다.");
+      } else if (error.status === 404) {
+        Alert.alert("로그인 실패", "해당 아이디의 유저가 없습니다.");
+      } else {
+        Alert.alert("오류", "로그인 중 문제가 발생했습니다.");
+      }
     }
-};
+  };
 
   const goRegister = () => {
     navigation.reset({
