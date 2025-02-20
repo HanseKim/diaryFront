@@ -113,6 +113,23 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
       console.error('Error saving diary data:', error);
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      const response = await apiClient.delete('/diary/delete-diary', {
+        data: { id: diaryId },
+      });
+      console.log("API Response:", response); // 추가된 로그
+      const data = response.data; // response.data를 직접 가져오기
+      if (data) {
+        navigation.navigate('Main');
+      } else {
+        Alert.alert(`Failed to delete diary: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Error deleting diary data:', error);
+    }
+  };
   
 
   return (
@@ -181,6 +198,9 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveButtonText}>Save</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+        <Text style={styles.deleteButtonText}>Delete</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -371,6 +391,29 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
       color: '#FFF',
+      fontSize: 16,
+      fontWeight: 'bold',
+  },
+  deleteButton: {
+    backgroundColor: 'white',
+    opacity: 1,
+    padding: 12,
+    borderRadius: 8,
+    borderColor:'red',
+    borderWidth: 1,
+    alignItems: 'center',
+    marginBottom: 15,
+    shadowColor: '#FF5C85',
+    shadowOffset: {
+    width: 8,
+    height: 8,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  deleteButtonText: {
+      color: 'red',
       fontSize: 16,
       fontWeight: 'bold',
   },
