@@ -6,9 +6,9 @@ import { Alert } from "react-native";
 
 // Axios 인스턴스 생성
 export const apiClient = axios.create({
-  //baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
-  baseURL: "http://127.0.0.1:80/", //IOS 에뮬레이터용
-  //baseURL : "https://203.245.30.195/",
+  //baseURL: "http://10.0.2.2:3000/", // 안드로이드 에뮬레이터용
+  //baseURL: "http://127.0.0.1:80/", //IOS 에뮬레이터용
+  baseURL: "http://203.245.30.195:3000/",
   headers: {
     "Content-Type": "application/json",
   },
@@ -26,7 +26,7 @@ export const fetchChatList = async () => {
 
     return response.data;
   } catch (error) {
-    console.error("Error fetching chat list:", error);
+
     throw error;
   }
 };
@@ -38,11 +38,11 @@ export const refreshToken = async () => {
     if (response.status === 200) {
       const newToken = response.data.token;
       await AsyncStorage.setItem("jwtToken", newToken);
-      console.log("토큰이 성공적으로 갱신되었습니다.");
+
     }
   } catch (error) {
     Alert.alert('재로그인 해주시기 바랍니다.');
-    console.error("토큰 갱신 실패:", error);
+
   }
 };
 
@@ -62,7 +62,7 @@ export const fetchGroupId = async () => {
       return false;
     }
   } catch (error) {
-    console.error("Error fetching group ID:", error);
+
 
     return false;
   }
@@ -86,7 +86,7 @@ apiClient.interceptors.request.use(async (config) => {
 export const login = async (id: string, password: string) => {
   try {
     const response = await apiClient.post("/login", { id, password });
-    console.log("Server Response:", response.data);
+
 
     const { token, user } = response.data;
 
@@ -99,11 +99,11 @@ export const login = async (id: string, password: string) => {
     await AsyncStorage.setItem("userpwd", password);
     await AsyncStorage.setItem("userInfo", JSON.stringify(user));
 
-    console.log("Diary Counts : ", user.diaryCounts);
-    console.log("CoupleCounts : ", user.coupleCounts);
+
+
     return user;
   } catch (error: any) {
-    console.error("Login error:", error.message);
+
 
     // 서버 오류에 대한 처리
     if (error.response) {
@@ -130,11 +130,11 @@ export const fetchData = async () => {
 export const setFcm = async (fcm_token: string) => {
   try {
     const response = await apiClient.post("/login/save-fcm-token", { fcm_token });
-    console.log("Server Response:", response.data);
+
 
     return response.data;
   } catch (error: any) {
-    console.error("Login error:", error.message);
+
 
     // 서버 오류에 대한 처리
     if (error.response) {
@@ -157,7 +157,7 @@ axios.interceptors.response.use(
   error => {
     if (error.message === 'Network Error') {
       Alert.alert('네트워크 오류가 발생했습니다. 인터넷 연결을 확인하세요.');
-      console.error('네트워크 오류가 발생했습니다. 인터넷 연결을 확인하세요.');
+
     }
     return Promise.reject(error);
   }

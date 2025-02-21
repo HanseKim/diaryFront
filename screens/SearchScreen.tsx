@@ -49,10 +49,10 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         setDiaryData(sortedData);
         setFilteredResults(sortedData); 
       } else {
-        console.error('Error fetching diary data:', data);
+
       }
     } catch (error) {
-      console.error('Error fetching diary data:', error);
+
     }
   };
 
@@ -66,7 +66,7 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           fetchDiaryData(parsedUser.id); // user_id가 설정된 후에 요청을 보냅니다.
         }
       } catch (error) {
-        console.error('Error fetching user info:', error);
+
       }
     };
 

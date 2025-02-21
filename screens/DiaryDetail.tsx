@@ -111,14 +111,14 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
             setCurrentUserId(storedUserId);
           }
         } catch (error) {
-          console.error('Error fetching current user ID:', error);
+
         }
       };
       
       getCurrentUserId();
       
       const diary_date = formatDate(year, month, date);
-      console.log(diary_date);
+
       fetchUsers(userid, diary_date);
     }, [])
   );
@@ -168,11 +168,11 @@ const DiaryDetailScreen: React.FC<{ route: any, navigation: any }> = ({ route, n
       if (json.success) {
         setDiary(json.data[0]);
       } else {
-        console.error('API error:', json);
+
         setDiary(null);
       }
     } catch (error) {
-      console.error('Fetch error:', error);
+
     }
   };
 

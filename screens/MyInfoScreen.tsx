@@ -49,7 +49,7 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
       //로그아웃시 로컬 데이터 전부 삭제
        // 로그인 화면의 이름에 따라 변경
     } catch (error) {
-      console.error("Error during logout:", error);
+
       Alert.alert("오류", "로그아웃 중 문제가 발생했습니다.");
     }
   };
@@ -87,7 +87,7 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
         }
       }
     } catch (error) {
-      console.error("Error fetching latest user info:", error);
+
       // 에러 발생 시 기존 AsyncStorage 데이터로 폴백
       const storedUserInfo = await AsyncStorage.getItem("userInfo");
       if (storedUserInfo) {
@@ -133,7 +133,7 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
         // 업데이트 후 최신 데이터 다시 가져오기
         await fetchLatestUserInfo();
       } else {
-        console.error("Error:", response.data.message);
+
       }
     } catch (error) {
       if (error instanceof Error && (error as any).response?.data) {
@@ -148,7 +148,7 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
       } else {
         Alert.alert("오류", "서버와의 연결 중 문제가 발생했습니다.");
       }
-      console.error("Error updating couple info:", error);
+
     }
   };
   const updateUserDate = async (newDate: string) =>{
@@ -163,11 +163,11 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
         // 업데이트 후 최신 데이터 다시 가져오기
         await fetchLatestUserInfo();
       } else {
-        console.error("Error:", response.data.message);
+
       }
     } catch (error) {
       Alert.alert("오류", "서버와의 연결 중 문제가 발생했습니다.");
-      console.error("Error updating couple info:", error);
+
     }
   }
 

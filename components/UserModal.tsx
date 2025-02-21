@@ -25,7 +25,7 @@ const UserModal:React.FC<UserModalProps> = ({handlemodal, updateUserInfo, update
     
     const handleSubmit = () => {
         if (!date || !validateDate(date)) {
-            console.log("날짜 입력 제대로");
+
             return;
         }
         if(coupleName === ''){

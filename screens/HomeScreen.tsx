@@ -109,7 +109,7 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
     const month = currentDate.getMonth();
     const year = currentDate.getFullYear();
     const [smalldiary, setsmallDiary] = useState<any[]>([]);
-    const [coupleName, setCoupleName] = useState<string>('');
+    const [coupleId, setCoupleId] = useState<string>('');
     const [couplediary, setCoupleDiary] = useState<any[]>([]);
     
     const calendarMatrix = generateCalender(year, month);
@@ -132,10 +132,10 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
                 const parsedUserInfo = JSON.parse(storedUserInfo);
                 setUserInfo(parsedUserInfo);
                 setUserid(parsedUserInfo.id); // userInfo에서 id를 설정
-                console.log("User ID: ", parsedUserInfo.id);
+
             }
         } catch (error) {
-            console.error("Error retrieving user info:", error);
+
         }
     };
     async function fetchCoupleId() {
@@ -151,16 +151,16 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
             });
             
             if (response.data.success) {
-                console.log("Couple data received:", response.data.data);
-                setCoupleName(response.data.data);
+
+                setCoupleId(response.data.data);
             } else {
-                console.error('API error:', response.data);
-                setCoupleName('');
+
+                setCoupleId('');
             }
         }
         catch (error) {
-            console.error('Fetch error:', error);
-            setCoupleName('');
+
+            setCoupleId('');
         }
     }
     async function fetchUsers() {
@@ -176,14 +176,14 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
             });
             
             if (response.data.success) {
-                console.log("Diary data received:", response.data.data);
+
                 setsmallDiary(response.data.data);
             } else {
-                console.error('API error:', response.data);
+
                 setsmallDiary([]);
             }
         } catch (error) {
-            console.error('Fetch error:', error);
+
             setsmallDiary([]);
         }
     }
@@ -193,11 +193,11 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
                 user_id: userid
             });
             if (response.data.success) {
-                console.log("Diary data received:", response.data.data);
+
                 setCoupleDiary(response.data.data);
             }
         } catch (error) {
-            console.error('Fetch error:', error);
+
             setCoupleDiary([]);
         }
     }
@@ -313,7 +313,7 @@ const HomeScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
                                                             clickdate: date, 
                                                             clickmonth: month, 
                                                             clickyear: year, 
-                                                            userid : coupleName
+                                                            userid : coupleId
                                                         })} 
                                                         style={{flex:0.4, justifyContent: 'center', alignItems: 'center'}}>
                                                         <Image 

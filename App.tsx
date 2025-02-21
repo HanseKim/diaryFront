@@ -16,6 +16,8 @@ import { setupForegroundNotificationListener } from './utils/notification';
 import { RecoilRoot } from 'recoil';
 import { useTokenRefresh } from './utils/tokenManager';
 
+import { LogBox } from 'react-native'; // 경고문 제거
+
 type RootStackParamList = {
   Login: undefined;
   Register: undefined;
@@ -37,7 +39,7 @@ function App(): React.JSX.Element {
       await initializeNotifications();
       setupForegroundNotificationListener();
     }
-    
+    LogBox.ignoreAllLogs();    
     setupNotifications();
   }, []);
 

@@ -31,27 +31,27 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
       if (enabled) {
         // 권한이 있는 경우에만 토큰 요청
         const token = await messaging().getToken();
-        console.log('FCM Token received:', token);
+
         return token;
       } else {
-        console.log('FCM permission denied');
+
         return null;
       }
     } catch (error) {
-      console.error('FCM token error:', error);
+
       return null;
     }
   }
 
   // 자동 로그인 체크
   const checkAutoLogin = async () => {
-    //console.log("자동 로그인 중");
+
     const uid = await AsyncStorage.getItem("userid");
     const upwd = await AsyncStorage.getItem("userpwd");
     try {
       if (uid != null && upwd != null) {
         const loginResult = await login(uid, upwd);
-        //console.log("Login API Result:", loginResult);
+
 
         // loginResult와 token이 있는지 확인
         // 로그인 성공 여부 체크
@@ -66,9 +66,9 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
           if (fcmToken) {
             try {
               await setFcm(fcmToken);
-              //console.log('FCM token successfully saved to server');
+
             } catch (fcmError) {
-              console.error('Failed to save FCM token:', fcmError);
+
               // FCM 토큰 저장 실패는 로그인 진행에 영향을 주지 않도록 함
             }
           }
@@ -88,7 +88,8 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
   // 로그인 처리 함수
   const handleLogin = async (id: string, password: string) => {
     try {
-      const loginResult = await login(id, password);
+      const lowerCaseId = id.toLowerCase();
+      const loginResult = await login(lowerCaseId, password);
 
       if (!loginResult) {
         throw new Error('Login response is invalid');
@@ -101,9 +102,9 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
       if (fcmToken) {
         try {
           await setFcm(fcmToken);
-          //console.log('FCM token successfully saved to server');
+
         } catch (fcmError) {
-          console.error('Failed to save FCM token:', fcmError);
+
           // FCM 토큰 저장 실패는 로그인 진행에 영향을 주지 않도록 함
         }
       }
@@ -115,7 +116,7 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
       });
 
     } catch (error: any) {
-      console.error("Login failed:", error);
+
       if (error.status === 401) {
         Alert.alert("로그인 실패", "비밀번호가 일치하지 않습니다.");
       } else if (error.status === 404) {

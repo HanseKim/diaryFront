@@ -32,7 +32,7 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
   // 백엔드에서 일기 데이터 가져오기
   const fetchDiaryData = async () => {
     try {
-      console.log(diaryId);
+
       const response = await apiClient.post(`/diary/edit-search`, {
         id: diaryId,
       });
@@ -45,12 +45,12 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
         // feeling을 숫자로 바로 저장 (1~5)
         setMood(response.data.feeling || null);
         setPrivacy(response.data.privacy); // "Private" or "Couple"
-        console.log("Data: ", response.data);
+
       } else {
-        console.error('Error fetching diary data:', response.data);
+
       }
     } catch (error) {
-      console.error('Error fetching diary data:', error);
+
     }
   };
 
@@ -73,12 +73,12 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
       privacy: privacy,
       diary_date: day,
     };
-    console.log("diaryData : ", diaryData);
+
   
     try {
       const response = await apiClient.post('/diary/edit-diary', diaryData);
   
-      console.log("API Response:", response);
+
       const data = response.data;
   
       if (data) {
@@ -92,7 +92,7 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
         Alert.alert(`Failed to save diary: ${data.error}`);
       }
     } catch (error) {
-      console.error('Error saving diary data:', error);
+
     }
   };
 
@@ -101,7 +101,7 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
       const response = await apiClient.delete('/diary/delete-diary', {
         data: { id: diaryId },
       });
-      console.log("API Response:", response);
+
       const data = response.data;
       if (data) {
         navigation.navigate('Main');
@@ -109,7 +109,7 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
         Alert.alert(`Failed to delete diary: ${data.error}`);
       }
     } catch (error) {
-      console.error('Error deleting diary data:', error);
+
     }
   };
 

@@ -12,21 +12,22 @@ import { apiClient } from '../utils/apiClient';
 const RegisterScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
   const handleRegister = async (nickname: string, id: string, password: string) => {
     try {
+      const lowerCaseId = id.toLowerCase();
       const response = await apiClient.post("/login/register", {
-        nickname, id, password 
+        nickname, id: lowerCaseId, password 
       });
-      const data = await response.data();
+      const data = await response.data;
       if (data.success) {
-        console.log("Registration successful!");
+
         navigation.reset({
           index: 0,
           routes: [{ name: 'Login' }],
         });
       } else {
-        console.error("Registration failed:", data.message);
+
       }
     } catch (error) {
-      console.error("Error during registration:", error);
+
     }
   };
 

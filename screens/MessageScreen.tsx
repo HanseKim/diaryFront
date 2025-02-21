@@ -37,7 +37,7 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
 
   const { token, groupid, userid } = route.params;
 
-  const socket = io("http://10.0.2.2:80/", {
+  const socket = io("http://203.245.30.195:3000/", {
     auth: {
       token, // 서버로 토큰 전달
     },
@@ -45,12 +45,12 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
 
   const joinRoom = () => {
     socket.emit("joinRoom", (groupid));
-    console.log("joined room : ", groupid);
+
   };
 
   const leaveRoom = () => {
     socket.emit("leaveRoom", (groupid)); // 서버에 Room leave 요청
-    console.log("leave Room");
+
   };
 
 
@@ -74,7 +74,7 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
   });
 
   socket.on("new msg set", (data, uid) => {
-    console.log("from chat data : ", data);
+
     if (uid === userid) {
     }
     else {
@@ -87,10 +87,10 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
       async function loadchat() {
         const tmp = await AsyncStorage.getItem("chatdata");
         if (tmp) {
-          //console.log(tmp);
+
           setMessages(JSON.parse(tmp));
         } else {
-          console.log("empty");
+
         }
       }
       loadchat();
@@ -102,7 +102,7 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
     joinRoom();
 
     return () => {
-      //console.log("socket disconnected");
+
       leaveRoom();
       socket.disconnect();
     }
@@ -114,9 +114,9 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
       try {
         const jsonValue = JSON.stringify(messages);
         await AsyncStorage.setItem("chatdata", jsonValue);
-        //console.log("Messages saved to AsyncStorage:", jsonValue);
+
       } catch (error) {
-        console.error("Error saving messages to AsyncStorage:", error);
+
       }
     };
 

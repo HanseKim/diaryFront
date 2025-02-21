@@ -16,7 +16,7 @@ const decodeJWT = (token: string) => {
         );
         return JSON.parse(jsonPayload);
     } catch (error) {
-        console.error("JWT 디코딩 오류:", error);
+
         return null;
     }
 };
@@ -40,11 +40,11 @@ const checkAndRefreshToken = async () => {
         const timeLeft = expTime - now;
 
         if (timeLeft < TOKEN_REFRESH_TIME) {
-            //console.log("토큰 만료 10분 전! 새로운 토큰을 요청합니다.");
+
             await refreshToken(); // 새 토큰 요청
         }
     } catch (error) {
-        console.error("토큰 체크 오류:", error);
+
     }
 };
 

@@ -20,10 +20,10 @@ async function createNotificationChannel() {
 export async function requestNotificationPermission() {
   const settings = await notifee.requestPermission();
 
-  console.log('Notification permission settings:', settings);
+
 
   if (settings.authorizationStatus >= 1) {
-    console.log('Notification permissions granted.');
+
     await createNotificationChannel(); // 채널 생성
   } else {
     Alert.alert('권한 거부됨', '알림 권한을 허용해주세요.');
@@ -41,11 +41,11 @@ export const useFCMListener = () => {
       const messageId = remoteMessage.messageId;
 
       if (!messageId || displayedNotifications.has(messageId)) {
-        console.log('📌 중복된 알림이므로 무시합니다.');
+
         return;
       }
 
-      console.log('📩 Foreground Notification Received:', remoteMessage);
+
 
       if (remoteMessage.notification) {
         await notifee.displayNotification({
@@ -90,11 +90,11 @@ export function setupForegroundNotificationListener() {
 
     // messageId가 없거나 이미 표시된 알림이면 무시
     if (!messageId || displayedNotifications.has(messageId)) {
-      console.log('📌 중복된 알림이므로 무시합니다.');
+
       return;
     }
 
-    console.log('📩 Foreground Notification Received:', remoteMessage);
+
 
 
 
@@ -155,13 +155,13 @@ export async function requestFCMPermission() {
     
     if (authStatus === messaging.AuthorizationStatus.AUTHORIZED) {
       const token = await messaging().getToken();
-      console.log('FCM Token:', token);
+
       return token; // 토큰을 서버에 보내기 위해 반환
     }
     
     return null;
   } catch (error) {
-    console.error('FCM 권한 요청 실패:', error);
+
     return null;
   }
 }
@@ -202,9 +202,9 @@ export async function scheduleDailyNotification() {
       }
     );
 
-    console.log('Daily notification scheduled for:', date.toLocaleString());
+
   } catch (error) {
-    console.error('Error scheduling notification:', error);
+
   }
 }*/
 
@@ -247,6 +247,6 @@ export async function onDisplayNotification() {
       }
     });
   } catch (error) {
-    console.error('Error displaying notification:', error);
+
   }
 }

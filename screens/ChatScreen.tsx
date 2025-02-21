@@ -41,13 +41,13 @@ const ChatScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigati
       setPartner(JSON.parse(String(stored_partner)).coupleName);
       const tmp = await AsyncStorage.getItem("chatdata");
       if (tmp) {
-        console.log(tmp);
+
         setMessages(JSON.parse(tmp));
       } else {
-        console.log("empty");
+
       }
       
-      console.log("try fetch chat list");
+
 
       const data = await fetchChatList();
 

@@ -145,7 +145,7 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
               setUser_id(parsedUser.id);
             }
           } catch (error) {
-            console.error('Error fetching user info:', error);
+
           }
         };
         getUserInfo();
@@ -185,7 +185,7 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
             if (axios.isAxiosError(error) && error.response?.status === 401) {
                 Alert.alert('이미 일기를 썼습니다.');
             }
-            console.error('Error saving diary data:', error);
+
             Alert.alert('Failed to save diary data');
         }
     };    
@@ -379,9 +379,10 @@ const styles = StyleSheet.create({
     },
     moodContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        justifyContent: 'space-between', // Changed from space-around
+        alignItems: 'center', // Added for vertical alignment
         marginBottom: 20,
-        padding: 10,
+        padding: 15,
         backgroundColor: 'white',
         borderRadius: 20,
         shadowColor: '#FF5C85',
@@ -392,9 +393,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 10,
         elevation: 5,
+        width: '100%', // Added to ensure full width
     },
     moodButton: {
-        padding: 8,
+        padding: 5, // Reduced padding
         borderRadius: 8,
         backgroundColor: '#FFF',
         shadowColor: '#FAC6DC80',
@@ -404,7 +406,10 @@ const styles = StyleSheet.create({
         elevation: 10,
         borderWidth: 1,
         borderColor: '#FAC6DC',
-        marginHorizontal: 8,
+        width: 55, // Fixed width
+        height: 55, // Fixed height
+        alignItems: 'center', // Center the image
+        justifyContent: 'center', // Center the image
     },
     moodButtonSelected: {
         backgroundColor: '#FAC6DC',

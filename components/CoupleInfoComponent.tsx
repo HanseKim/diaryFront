@@ -44,7 +44,7 @@ const CoupleInfoComponent:React.FC<CoupleInfoComponentProps> = ({name,daysPassed
                 Alert.alert("오류", "커플 삭제에 실패했습니다.");
               }
             } catch (error) {
-              console.error("Error deleting couple:", error);
+
               Alert.alert("오류", "서버 오류가 발생했습니다.");
             }
           }
