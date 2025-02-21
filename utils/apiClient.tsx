@@ -6,8 +6,8 @@ import { Alert } from "react-native";
 
 // Axios 인스턴스 생성
 export const apiClient = axios.create({
-  baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
-  //baseURL: "http://127.0.0.1:80/", //IOS 에뮬레이터용
+  //baseURL: "http://10.0.2.2:80/", // 안드로이드 에뮬레이터용
+  baseURL: "http://127.0.0.1:80/", //IOS 에뮬레이터용
   //baseURL : "https://203.245.30.195/",
   headers: {
     "Content-Type": "application/json",

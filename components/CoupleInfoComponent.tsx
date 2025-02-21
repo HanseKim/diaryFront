@@ -65,14 +65,14 @@ const CoupleInfoComponent:React.FC<CoupleInfoComponentProps> = ({name,daysPassed
   return (
     <View style={styles.container}>
       <View style={styles.title}>
-        <View style={{height: 50}}>
+        <View style={{height: 40, justifyContent: 'center'}}>
           <Text style={{
             fontSize: 25,
             fontWeight: 'bold',
           }}>{name}</Text>
-          <Text style={{
+          {/* <Text style={{
             fontSize: 15, 
-          }}>{daysPassed!==-1 ? `D+${daysPassed}` : "D+???"}</Text>
+          }}>{daysPassed!==-1 ? `D+${daysPassed}` : "D+???"}</Text> */}
         </View>
         <View style={{height:30}}>
           <TouchableOpacity onPress={handleDeleteCouple}>
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   title : {
     flex: 0.3,
-    height: 50,
+    height: 40,
     margin: 10,
     marginBottom: 40,
     flexDirection: 'row',

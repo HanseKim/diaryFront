@@ -10,9 +10,18 @@ import { RecoilRoot } from 'recoil';
 
 
 // Firebase 메시징 백그라운드 핸들러 설정
-messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-    console.log('Message handled in the background:', remoteMessage);
-});
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+    if (remoteMessage.notification) {
+      await notifee.displayNotification({
+        title: remoteMessage.notification.title,
+        body: remoteMessage.notification.body,
+        ios: {
+          sound: 'default',
+          categoryId: 'default',
+        }
+      });
+    }
+  });
 
 // Notifee 백그라운드 이벤트 처리 설정
 notifee.onBackgroundEvent(async ({ type, detail }) => {
