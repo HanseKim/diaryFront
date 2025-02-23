@@ -139,26 +139,31 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
   }, []);
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.backgroundContainer}>
-          <Image
-            source={require('../images/bg_pinkwave.png')}
-            style={styles.backgroundImage}
-          />
-        </View>
-        <View style={styles.contentContainer}>
-          <Image source={require('../images/logo.png')} style={styles.logo} />
-          <LoginInputScreen
-            onLogin={handleLogin}
-            goRegister={goRegister}
-          />
-        </View>
-      </ScrollView>
-    </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"} // iOS는 padding, Android는 height
+      style={{ flex: 1 }}
+    >
+      <View style={styles.container}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.backgroundContainer}>
+            <Image
+              source={require('../images/bg_pinkwave.png')}
+              style={styles.backgroundImage}
+            />
+          </View>
+          <View style={styles.contentContainer}>
+            <Image source={require('../images/logo.png')} style={styles.logo} />
+            <LoginInputScreen
+              onLogin={handleLogin}
+              goRegister={goRegister}
+            />
+          </View>
+        </ScrollView>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
