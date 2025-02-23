@@ -1,4 +1,4 @@
-import React, { TimeHTMLAttributes, useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
     View, 
     Text,
@@ -6,29 +6,35 @@ import {
     Modal,
     Pressable,
     TouchableOpacity,
+    Alert,
 } from 'react-native';
 import { TextInput } from "react-native-gesture-handler";
 
-type UserModalProps={
-    handlemodal: (modal:number) => void
-    updateUserInfo: (newDate: string, coupleName: string) => void
-    updateUserDate: (newDate: string) => void
-}
-const UserModal:React.FC<UserModalProps> = ({handlemodal, updateUserInfo, updateUserDate}) => {
+type UserModalProps = {
+    handlemodal: (modal: number) => void;
+    updateUserInfo: (newDate: string, coupleName: string) => void;
+    updateUserDate: (newDate: string) => void;
+};
+
+const UserModal: React.FC<UserModalProps> = ({
+    handlemodal,
+    updateUserInfo,
+    updateUserDate
+}) => {
     const [coupleName, setCoupleName] = useState<string>("");
     const [date, setDate] = useState<string>("");
     
     const validateDate = (dateString: string) => {
-        const regex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD 형식
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
         return regex.test(dateString);
     };
     
     const handleSubmit = () => {
         if (!date || !validateDate(date)) {
-
+            Alert.alert("날짜 형식 오류", "YYYY-MM-DD 형식으로 입력해주세요");
             return;
         }
-        if(coupleName === ''){
+        if (coupleName === '') {
             updateUserDate(date);
             handlemodal(0);
             return;
@@ -43,106 +49,168 @@ const UserModal:React.FC<UserModalProps> = ({handlemodal, updateUserInfo, update
             transparent={true}
             onRequestClose={() => handlemodal(0)}
         >
-            <Pressable style={styles.modalOveray} onPress={() => handlemodal(0)}>
+            <Pressable style={styles.modalOverlay} onPress={() => handlemodal(0)}>
                 <View 
                     style={styles.modalContents}
                     onStartShouldSetResponder={() => true}
                 >
-                    <Text style={styles.modaltitle}>프로필 수정하기</Text>
-                    <View style={styles.input}>
-                        <View style={styles.inputComponent}>
-                            <Text style={{ fontWeight: 'bold' }}>처음 만난 날</Text>
-                            <TextInput
-                                style={styles.inputText}
-                                placeholder="2025-01-18"
-                                placeholderTextColor="gray"
-                                value={date}
-                                onChangeText={setDate}
-                            />
+                    <View style={styles.ribbon}>
+                        <View style={styles.ribbonEnd} />
+                    </View>
+
+                    <View style={styles.modalHeader}>
+                        <Text style={styles.modalTitle}>프로필 수정하기</Text>
+                        <View style={styles.headerDecoration} />
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.inputLabel}>처음 만난 날</Text>
+                            <View style={styles.inputBox}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="2025-01-18"
+                                    placeholderTextColor="#FFB6C1"
+                                    value={date}
+                                    onChangeText={setDate}
+                                />
+                            </View>
                         </View>
-                        <View style={styles.inputComponent}>
-                            <Text style={{fontWeight:'bold'}}>연인의 이름 입력하기</Text>
-                            <TextInput
-                            value={coupleName}
-                            style={styles.inputText}
-                            placeholder="이름"
-                            placeholderTextColor="gray"
-                            onChangeText={setCoupleName}
-                            />
+
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.inputLabel}>연인의 이름</Text>
+                            <View style={styles.inputBox}>
+                                <TextInput
+                                    value={coupleName}
+                                    style={styles.input}
+                                    placeholder="이름을 입력해주세요"
+                                    placeholderTextColor="#FFB6C1"
+                                    onChangeText={setCoupleName}
+                                />
+                            </View>
                         </View>
                     </View>
+
                     <TouchableOpacity 
-                        style={styles.modalbtn} 
+                        style={styles.submitButton} 
                         onPress={handleSubmit}
                     >
-                        <Text style={{ fontSize: 15, fontWeight: 'bold' }}>입력하기</Text>
+                        <Text style={styles.submitButtonText}>입력하기</Text>
                     </TouchableOpacity>
                 </View>
             </Pressable>
         </Modal>
     );
-}
+};
 
 const styles = StyleSheet.create({
-    modalOveray:{
+    modalOverlay: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경
+        backgroundColor: 'rgba(211, 211, 211, 0.7)', 
     },
-    modalContents:{
-        width: 300,
-        height: 400,
-        padding: 20,
+    modalContents: {
+        width: 320,
+        paddingVertical: 30,
+        paddingHorizontal: 20,
         backgroundColor: 'white',
-        borderRadius: 10,
-        flexDirection: "column",
+        borderRadius: 25,
         alignItems: 'center',
-        justifyContent: 'space-evenly'
-    },
-    modaltitle : {
-        fontSize: 22,
-        fontWeight: 'bold'
-    },
-    input : { 
-        width: '100%', 
-        height: '60%',
-        justifyContent: 'space-evenly', 
-        alignItems: 'center',
-    },
-    inputComponent : {
-        height: '40%',
-        alignItems : 'center',
-        justifyContent : 'space-around'
-    },
-    inputText : {
-        width: 150,
-        height: 40,
-        padding: 10,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 8,
-    },
-    modalbtn : {
-        width: 160,
-        height: 30,
-        backgroundColor: '#F5BFD9',
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: '#F5BFD9',
+        borderWidth: 2,
+        borderColor: '#FFE5EC',
+        shadowColor: '#FFB6C1',
         shadowOffset: {
-        width: 5,
-        height: 5,
+            width: 0,
+            height: 4,
         },
-        shadowOpacity: 0.8,
-        shadowRadius: 5,
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
         elevation: 5,
     },
-})
+    ribbon: {
+        position: 'absolute',
+        top: -15,
+        width: 60,
+        height: 30,
+        backgroundColor: '#FF9CB1',
+        borderRadius: 8,
+        transform: [{ rotate: '-5deg' }],
+    },
+    ribbonEnd: {
+        position: 'absolute',
+        bottom: -10,
+        left: 20,
+        width: 20,
+        height: 20,
+        backgroundColor: '#FF9CB1',
+        transform: [{ rotate: '45deg' }],
+    },
+    modalHeader: {
+        width: '100%',
+        alignItems: 'center',
+        marginBottom: 30,
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#FF6699',
+        marginBottom: 8,
+    },
+    headerDecoration: {
+        width: 40,
+        height: 3,
+        backgroundColor: '#FFB6C1',
+        borderRadius: 2,
+    },
+    inputContainer: {
+        width: '100%',
+        marginBottom: 25,
+    },
+    inputWrapper: {
+        marginBottom: 20,
+    },
+    inputLabel: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#FF6699',
+        marginBottom: 8,
+        marginLeft: 4,
+    },
+    inputBox: {
+        backgroundColor: '#FFF5F7',
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: '#FFE5EC',
+        paddingHorizontal: 15,
+        height: 45,
+        justifyContent: 'center',
+    },
+    input: {
+        fontSize: 15,
+        color: '#FF6699',
+    },
+    submitButton: {
+        width: '80%',
+        height: 50,
+        backgroundColor: '#FF9CB1',
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#FFB6C1',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 3,
+    },
+    submitButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+});
 
 export default UserModal;
-
-function alert(arg0: string) {
-    throw new Error("Function not implemented.");
-}

@@ -3,11 +3,14 @@ import {
   View,
   Image,
   StyleSheet,
-  ScrollView
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import RegisterInputScreen from '../components/RegisterInputScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '../utils/apiClient';
+import KeyboardAvoidComponent from '../components/KeyboardAvoidComponent';
 
 const RegisterScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
   const handleRegister = async (nickname: string, id: string, password: string) => {
@@ -39,6 +42,7 @@ const RegisterScreen: React.FC<{ route: any, navigation: any }> = ({ route, navi
   }
 
   return (
+    <KeyboardAvoidComponent>
     <View style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
@@ -59,6 +63,7 @@ const RegisterScreen: React.FC<{ route: any, navigation: any }> = ({ route, navi
         </View>
       </ScrollView>
     </View>
+    </KeyboardAvoidComponent>
   );
 };
 

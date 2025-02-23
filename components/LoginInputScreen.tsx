@@ -46,7 +46,7 @@ const LoginInputScreen: React.FC<LoginInputScreenProps> = ({ onLogin, goRegister
               <TextInput
                 style={styles.input}
                 placeholder="아이디"
-                placeholderTextColor="#F5BFD9"
+                placeholderTextColor="#FFD6EA"
                 value={id}
                 onChangeText={setId}
               />
@@ -55,7 +55,7 @@ const LoginInputScreen: React.FC<LoginInputScreenProps> = ({ onLogin, goRegister
               <TextInput
                 style={styles.input}
                 placeholder="비밀번호"
-                placeholderTextColor="#F5BFD9"
+                placeholderTextColor="#FFD6EA"
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}

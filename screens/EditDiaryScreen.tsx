@@ -8,8 +8,10 @@ import {
   StyleSheet,
   Alert,
   Image,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { apiClient } from '../utils/apiClient';
+import KeyboardAvoidComponent from '../components/KeyboardAvoidComponent';
 
 // myFace 이미지 import
 const angry = require('../images/myFace/angry.png');
@@ -123,7 +125,7 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <KeyboardAvoidComponent>
       <View style={styles.header}>
           <Text style={styles.dateText}>{formatDate(date)}</Text>
       </View>
@@ -184,7 +186,7 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
       <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
         <Text style={styles.deleteButtonText}>Delete</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+      </KeyboardAvoidComponent>
   );
 };
 

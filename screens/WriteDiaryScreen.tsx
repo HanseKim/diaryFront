@@ -8,7 +8,10 @@ import {
     StyleSheet,
     Alert,
     Platform,
-    Image
+    Image,
+    Keyboard,
+    TouchableWithoutFeedback,
+    KeyboardAvoidingView
 } from 'react-native';
 
 import axios from 'axios';
@@ -200,85 +203,94 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.Text} onPress={handlePrevDate}>◀</Text>
-                <Text style={styles.dateText}>{formatDate(date)}</Text>
-                <Text style={styles.Text} onPress={handleNextDate}>▶</Text>
-            </View>
-            <View style={{marginBottom: 15,
-                padding: 10,
-                backgroundColor: 'white',
-                borderRadius: 20,
-                shadowColor: '#FF5C85',
-                shadowOffset: {
-                width: 8,
-                height: 8,
-                },
-                shadowOpacity: 0.2,
-                shadowRadius: 10,
-                elevation: 5,}}>
-                <TextInput
-                    style={styles.inputHeadline}
-                    placeholder="Headline"
-                    value={headline}
-                    placeholderTextColor="#F6A5C0" 
-                    onChangeText={setHeadline}
-                />
+            <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={{flex:1}}
+                  >
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                        <View style={{flex:1}}>
+                            <View style={styles.header}>
+                                <Text style={styles.Text} onPress={handlePrevDate}>◀</Text>
+                                <Text style={styles.dateText}>{formatDate(date)}</Text>
+                                <Text style={styles.Text} onPress={handleNextDate}>▶</Text>
+                            </View>
+                            <View style={{marginBottom: 15,
+                                padding: 10,
+                                backgroundColor: 'white',
+                                borderRadius: 20,
+                                shadowColor: '#FF5C85',
+                                shadowOffset: {
+                                width: 8,
+                                height: 8,
+                                },
+                                shadowOpacity: 0.2,
+                                shadowRadius: 10,
+                                elevation: 5,}}>
+                                <TextInput
+                                    style={styles.inputHeadline}
+                                    placeholder="Headline"
+                                    value={headline}
+                                    placeholderTextColor="#F6A5C0" 
+                                    onChangeText={setHeadline}
+                                />
 
-                <TextInput
-                    style={styles.inputContent}
-                    placeholder="Start typing..."
-                    value={content}
-                    placeholderTextColor="#F6A5C0" 
-                    onChangeText={setContent}
-                    multiline
-                />
-            </View>
-        
-            <View style={styles.moodContainer}>
-                {moodOptions.map((option, index) => (
-                    <TouchableOpacity
-                        key={index}
-                        style={[
-                        styles.moodButton,
-                        mood === option.value && styles.moodButtonSelected,
-                        ]}
-                        onPress={() => setMood(option.value)}
-                    >
-                        <Image
-                        source={option.image}
-                        style={{ width: 40, height: 40 }}
-                        resizeMode="contain"
-                        />
-                    </TouchableOpacity>
-                ))}
-            </View>
+                                <TextInput
+                                    style={styles.inputContent}
+                                    placeholder="Start typing..."
+                                    value={content}
+                                    placeholderTextColor="#F6A5C0" 
+                                    onChangeText={setContent}
+                                    multiline
+                                />
+                            </View>
+                        
+                            <View style={styles.moodContainer}>
+                                {moodOptions.map((option, index) => (
+                                    <TouchableOpacity
+                                        key={index}
+                                        style={[
+                                        styles.moodButton,
+                                        mood === option.value && styles.moodButtonSelected,
+                                        ]}
+                                        onPress={() => setMood(option.value)}
+                                    >
+                                        <Image
+                                        source={option.image}
+                                        style={{ width: 40, height: 40 }}
+                                        resizeMode="contain"
+                                        />
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
 
-            <View style={styles.privacyContainer}>
-                {['Private', 'Couple'].map((option) => (
-                    <TouchableOpacity
-                    key={option}
-                    style={[
-                        styles.privacyOption,
-                        styles.boxShadow,
-                        privacy === option && styles.privacyOptionSelected // 조건부 스타일링
-                    ]}
-                    onPress={() => setPrivacy(option as 'Private' | 'Couple')}
-                    >
-                    <Text
-                        style={[
-                        styles.privacyText,
-                        privacy === option && styles.privacyTextSelected // 텍스트 스타일도 조건부 적용
-                        ]}
-                    >
-                        {option}
-                    </Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                <Text style={styles.saveButtonText}>Save</Text>
-            </TouchableOpacity>
+                            <View style={styles.privacyContainer}>
+                                {['Private', 'Couple'].map((option) => (
+                                    <TouchableOpacity
+                                    key={option}
+                                    style={[
+                                        styles.privacyOption,
+                                        styles.boxShadow,
+                                        privacy === option && styles.privacyOptionSelected // 조건부 스타일링
+                                    ]}
+                                    onPress={() => setPrivacy(option as 'Private' | 'Couple')}
+                                    >
+                                    <Text
+                                        style={[
+                                        styles.privacyText,
+                                        privacy === option && styles.privacyTextSelected // 텍스트 스타일도 조건부 적용
+                                        ]}
+                                    >
+                                        {option}
+                                    </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                                <Text style={styles.saveButtonText}>Save</Text>
+                            </TouchableOpacity>
+                        </View>
+            </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };

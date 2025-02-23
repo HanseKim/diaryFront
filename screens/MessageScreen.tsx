@@ -18,6 +18,7 @@ import { io } from "socket.io-client";
 import { AppContext } from "../contexts/appContext";
 import moment from 'moment';
 import { useFocusEffect } from "@react-navigation/native";
+import KeyboardAvoidComponent from "../components/KeyboardAvoidComponent";
 
 type MessageProp = {
   id: string; user: string; text: string, date: string;
@@ -145,11 +146,7 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
   );
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1, backgroundColor: "white" }}
-      >
+    <KeyboardAvoidComponent>
         {/* 채팅 메시지 리스트 */}
         <FlatList
           ref={flatListRef} // FlatList에 ref 연결
@@ -176,8 +173,7 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
             <Text style={styles.sendButtonText}>Send</Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+      </KeyboardAvoidComponent>
   );
 };
 

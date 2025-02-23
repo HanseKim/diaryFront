@@ -125,9 +125,9 @@ const styles = StyleSheet.create({
   },
   chatRoomContainer: {
     borderRadius: 8,
-    borderColor: '#F5BFD9',
+    borderColor: '#FFD6EA',
     borderWidth: 1,
-    shadowColor: "#F5BFD9",
+    shadowColor: "#FFD6EA",
     shadowOffset: {
       width: 13,
       height: 13,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   unreadCount: {
     fontSize: 12,
-    color: "#F5BFD9",
+    color: "#FFD6EA",
     marginTop: 5,
     fontWeight: "bold",
   },

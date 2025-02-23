@@ -203,13 +203,19 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
   }
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor:'white' }}>
+    <View style={{ 
+      flex: 1,
+      width: '100%',
+      height: '100%', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      backgroundColor:'#FFF5F7',
+      }}>
       {renderModal()}
       <Animatable.View
         animation={animateUser ? 'fadeInUp' : undefined}
         duration={500}
         delay={100}
-        style={{ marginBottom: 10 }}
       >
         <UserInfoComponent 
           name={userInfo ? userInfo.nickname || "???" : "???"} 

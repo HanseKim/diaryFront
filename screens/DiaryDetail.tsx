@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   highlightBox: {
-    backgroundColor: '#F5BFD9',
+    backgroundColor: '#FFD6EA',
     flexDirection: 'row',
     borderRadius: 10,
     width: '40%',

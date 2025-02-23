@@ -48,7 +48,7 @@ const RegisterInputScreen: React.FC<RegisterInputScreenProps> = ({ handleRegiste
               <TextInput
                 style={styles.input}
                 placeholder="이름 / 애칭"
-                placeholderTextColor="#F5BFD9"
+                placeholderTextColor="#FFD6EA"
                 value={nickname}
                 onChangeText={setNickname}
               />
@@ -57,7 +57,7 @@ const RegisterInputScreen: React.FC<RegisterInputScreenProps> = ({ handleRegiste
               <TextInput
                 style={styles.input}
                 placeholder="아이디"
-                placeholderTextColor="#F5BFD9"
+                placeholderTextColor="#FFD6EA"
                 value={id}
                 onChangeText={setId}
               />
@@ -66,7 +66,7 @@ const RegisterInputScreen: React.FC<RegisterInputScreenProps> = ({ handleRegiste
               <TextInput
                 style={styles.input}
                 placeholder="비밀번호"
-                placeholderTextColor="#F5BFD9"
+                placeholderTextColor="#FFD6EA"
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}

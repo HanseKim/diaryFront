@@ -4,14 +4,17 @@ import {
   Image,
   StyleSheet,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingViewComponent
 } from 'react-native';
 import LoginInputScreen from '../components/LoginInputScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { login, setFcm } from '../utils/apiClient';
 import messaging from '@react-native-firebase/messaging';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import KeyboardAvoidComponent from '../components/KeyboardAvoidComponent';
 
 const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
   const [user, setUser] = useState(null);
@@ -116,7 +119,7 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
       });
 
     } catch (error: any) {
-
+      Keyboard.dismiss();
       if (error.status === 401) {
         Alert.alert("로그인 실패", "비밀번호가 일치하지 않습니다.");
       } else if (error.status === 404) {
@@ -139,31 +142,28 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
   }, []);
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"} // iOS는 padding, Android는 height
-      style={{ flex: 1 }}
-    >
-      <View style={styles.container}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.backgroundContainer}>
-            <Image
-              source={require('../images/bg_pinkwave.png')}
-              style={styles.backgroundImage}
-            />
-          </View>
-          <View style={styles.contentContainer}>
-            <Image source={require('../images/logo.png')} style={styles.logo} />
-            <LoginInputScreen
-              onLogin={handleLogin}
-              goRegister={goRegister}
-            />
-          </View>
-        </ScrollView>
-      </View>
-    </KeyboardAvoidingView>
+    <KeyboardAvoidComponent>
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.backgroundContainer}>
+          <Image
+            source={require('../images/bg_pinkwave.png')}
+            style={styles.backgroundImage}
+          />
+        </View>
+        <View style={styles.contentContainer}>
+          <Image source={require('../images/logo.png')} style={styles.logo} />
+          <LoginInputScreen
+            onLogin={handleLogin}
+            goRegister={goRegister}
+          />
+        </View>
+      </ScrollView>
+    </View>
+    </KeyboardAvoidComponent>
   );
 };
 
