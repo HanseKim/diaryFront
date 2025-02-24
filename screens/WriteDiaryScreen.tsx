@@ -124,12 +124,14 @@ const PreDiaryQuestionsScreen: React.FC<{ navigation: any }> = ({ navigation }) 
 };
 
 const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
-    const [date, setDate] = useState(route.params?.date ? new Date(route.params.date) : new Date());
+    // const [date, setDate] = useState(route.params?.date ? new Date(route.params.date) : new Date());
     const [headline, setHeadline] = useState('');
     const [content, setContent] = useState('');
     const [mood, setMood] = useState<string | null>(null);
     const [privacy, setPrivacy] = useState<'Private' | 'Couple' | null>('Private');
     const [user_id, setUser_id] = useState<string>('');
+    const initialDate = route.params?.date ? new Date(route.params.date) : new Date();
+    const [date, setDate] = useState(initialDate);
 
     const formatDate = (date: Date) => {
         return `${date.getMonth() + 1}/${date.getDate()}`;
@@ -190,12 +192,11 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
             const response = await apiClient.post("/diary/write", diaryData);
     
             if (response.status === 200) {
-                navigation.navigate('Detail', {
-                    clickdate: date.getDate(),
-                    clickmonth: date.getMonth(),
-                    clickyear: date.getFullYear(),
-                    userid: user_id,
-                });
+                // 성공적으로 저장 후 홈 화면으로 이동
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Main' }],
+                  });
             } else if (response.status === 401) {
                 Alert.alert('이미 일기를 썼습니다.');
             } else {
@@ -205,10 +206,11 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
             if (axios.isAxiosError(error) && error.response?.status === 401) {
                 Alert.alert('이미 일기를 썼습니다.');
             }
-
+    
             Alert.alert('Failed to save diary data');
         }
-    };    
+    };
+      
     const moodOptions = [
         { value: '😞', image: sad },
         { value: '😠', image: angry },

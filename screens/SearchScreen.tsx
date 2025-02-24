@@ -79,11 +79,14 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   };
 
   const handleItemPress = (item: DiaryEntry) => {
-    navigation.navigate('Detail', {
-      clickdate: parseInt(item.diary_date.split('-')[2], 10),
-      clickmonth: parseInt(item.diary_date.split('-')[1], 10) - 1,
-      clickyear: parseInt(item.diary_date.split('-')[0], 10),
-      userid: user_id,
+    navigation.navigate('Home', {
+      screen: 'Detail',
+      params: {
+        clickdate: parseInt(item.diary_date.split('-')[2], 10),
+        clickmonth: parseInt(item.diary_date.split('-')[1], 10) - 1,
+        clickyear: parseInt(item.diary_date.split('-')[0], 10),
+        userid: user_id,
+      }
     });
   };
 

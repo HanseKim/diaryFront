@@ -79,7 +79,6 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
   
     try {
       const response = await apiClient.post('/diary/edit-diary', diaryData);
-  
 
       const data = response.data;
   
@@ -106,7 +105,10 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
 
       const data = response.data;
       if (data) {
-        navigation.navigate('Main');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Main' }],
+        });
       } else {
         Alert.alert(`Failed to delete diary: ${data.error}`);
       }
