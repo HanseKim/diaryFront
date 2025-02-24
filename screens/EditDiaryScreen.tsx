@@ -133,7 +133,7 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
         {/* Date Header */}
         <View style={styles.navigationHeader}>
           <View style={styles.dateContainer}>
-            <Text style={styles.dateText}>📅 {formatDate(date)}</Text>
+            <Text style={styles.dateText}>{formatDate(date)}</Text>
           </View>
         </View>
 
@@ -276,6 +276,8 @@ const styles = StyleSheet.create({
     borderColor: '#FFB6C1',
   },
   dateText: {
+    width: 50,
+    textAlign: 'center',
     fontSize: 18,
     color: '#FF6699',
     fontWeight: '600',
