@@ -7,12 +7,6 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Alert,
   SafeAreaView,
 } from "react-native";
 import { io } from "socket.io-client";
@@ -171,10 +165,12 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
                 </View>
               </View>
             )}
-            contentContainerStyle={styles.chatList}
+            contentContainerStyle={{ flexGrow: 1 }}
             showsVerticalScrollIndicator={true}
-            nestedScrollEnabled={true}
-            onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
+            nestedScrollEnabled={false} // nestedScrollEnabled를 false로 변경
+            onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+            keyboardDismissMode="on-drag" // on-drag로 설정
+            keyboardShouldPersistTaps="handled" // "handled"로 변경
           />
   
           <View style={styles.inputContainer}>

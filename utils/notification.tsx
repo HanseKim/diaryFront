@@ -94,13 +94,8 @@ export function setupForegroundNotificationListener() {
       return;
     }
 
-
-
-
-
     if (remoteMessage.notification) {
       
-
       await notifee.displayNotification({
         title: remoteMessage.notification.title || '알림',
         body: remoteMessage.notification.body || '새로운 메시지가 도착했습니다.',

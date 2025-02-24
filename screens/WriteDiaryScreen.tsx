@@ -17,6 +17,7 @@ import {
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '../utils/apiClient';
+import KeyboardAvoidComponent from '../components/KeyboardAvoidComponent';
 // 이모티콘 이미지 import (myFace 폴더 내 이미지)
 const angry = require('../images/myFace/angry.png');
 const sad = require('../images/myFace/sad.png');
@@ -221,7 +222,7 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
 
 
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <KeyboardAvoidComponent>
             <View style={styles.container}>
                 <View style={styles.diaryCard}>
                     <View style={styles.ribbon}>
@@ -312,7 +313,7 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
                     </TouchableOpacity>
                 </View>
             </View>
-        </TouchableWithoutFeedback>
+        </KeyboardAvoidComponent>
     );    
 };
 

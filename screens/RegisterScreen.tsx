@@ -5,7 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
-  ImageBackground
+  ImageBackground,
+  Alert
 } from 'react-native';
 import RegisterInputScreen from '../components/RegisterInputScreen';
 import { apiClient } from '../utils/apiClient';
@@ -28,9 +29,11 @@ const RegisterScreen: React.FC<{ route: any, navigation: any }> = ({ route, navi
         });
       } else {
         // Handle registration failure
+        Alert.alert("회원가입 실패", "네트워크 오류가 발생했어요. 다시 시도해주세요.");
       }
     } catch (error) {
       // Handle error
+      Alert.alert("회원가입 실패", "네트워크 오류가 발생했어요. 다시 시도해주세요.");
     }
   };
 

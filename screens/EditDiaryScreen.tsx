@@ -128,7 +128,7 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
     { value: 5, image: veryhappy },
   ];
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <KeyboardAvoidComponent>
       <View style={styles.container}>
         <View style={styles.diaryCard}>
           <View style={styles.ribbon}>
@@ -219,7 +219,7 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
           </View>
         </View>
       </View>
-    </TouchableWithoutFeedback>
+      </KeyboardAvoidComponent>
   );
 };
 

@@ -1,37 +1,34 @@
 import React, { useEffect } from 'react';
+import { Alert, LogBox } from 'react-native';
+import messaging from '@react-native-firebase/messaging';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './screens/LoginScreen';
 import SignUpScreen from './screens/SignUpScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import MainTabNavigator from './navigators/MainTabNavigator';
-import { initializeNotifications } from './utils/notification';
-import { useFCMListener } from './utils/notification';
 import { AppProvider } from './contexts/appContext';
-import { setupForegroundNotificationListener } from './utils/notification';
 import { RecoilRoot } from 'recoil';
-import { useTokenRefresh } from './utils/tokenManager';
-import { LogBox } from 'react-native';
+import { initializeNotifications, useFCMListener, setupForegroundNotificationListener } from './utils/notification';
 
-type AuthStackParamList = {
-  Login: undefined;
-  Register: undefined;
-  SignUp: undefined;
-  Main: undefined;
-};
+// FCM APNs 토큰 체크 (iOS)
+async function checkAPNsToken() {
+  const token = await messaging().getAPNSToken();
+  console.log('🔥 APNs Token:', token);
+}
 
-const AuthStack = createStackNavigator<AuthStackParamList>();
+const AuthStack = createStackNavigator();
 
 function App(): React.JSX.Element {
-  useTokenRefresh();
-
   useEffect(() => {
     async function setupNotifications() {
-      await initializeNotifications();
-      setupForegroundNotificationListener();
+      await initializeNotifications(); // 알림 권한 요청 & 설정
+      setupForegroundNotificationListener(); // 포그라운드 알림 리스너 실행
     }
-    LogBox.ignoreAllLogs();
+
+    LogBox.ignoreAllLogs(); // 불필요한 경고 숨김
     setupNotifications();
+    checkAPNsToken(); // iOS용 APNs 토큰 체크
   }, []);
 
   return (
@@ -57,6 +54,7 @@ function App(): React.JSX.Element {
   );
 }
 
+// 🔹 FCM 알림 리스너 감싸기
 const FCMListenerWrapper = () => {
   useFCMListener();
   return null;
