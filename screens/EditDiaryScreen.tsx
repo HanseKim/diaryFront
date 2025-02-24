@@ -123,230 +123,273 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
     { value: 4, image: happy },
     { value: 5, image: veryhappy },
   ];
-
   return (
-    <KeyboardAvoidComponent>
-      <View style={styles.header}>
-          <Text style={styles.dateText}>{formatDate(date)}</Text>
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.inputHeadline}
-          placeholder="Headline"
-          value={headline}
-          onChangeText={setHeadline}
-        />
-        <TextInput
-          style={styles.inputContent}
-          placeholder="Start typing..."
-          value={content}
-          onChangeText={setContent}
-          multiline
-        />
-      </View>
+    <View style={styles.container}>
+      <View style={styles.diaryCard}>
+        <View style={styles.ribbon}>
+          <View style={styles.ribbonEnd} />
+        </View>
 
-      {/* mood 선택: 기존 이모티콘 Text 대신 이미지로 표시 */}
-      <View style={styles.moodContainer}>
-        {moodOptions.map((option, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[styles.moodButton, mood === option.value && styles.moodButtonSelected]}
-            onPress={() => setMood(option.value)}
-          >
-            <Image 
-              source={option.image} 
-              style={{ width: 40, height: 40 }} 
-              resizeMode="contain" 
-            />
+        {/* Date Header */}
+        <View style={styles.navigationHeader}>
+          <View style={styles.dateContainer}>
+            <Text style={styles.dateText}>📅 {formatDate(date)}</Text>
+          </View>
+        </View>
+
+        {/* Mood Selection */}
+        <View style={styles.emotionSection}>
+          <View style={styles.moodContainer}>
+            {moodOptions.map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.moodButton,
+                  mood === option.value && styles.moodButtonSelected
+                ]}
+                onPress={() => setMood(option.value)}
+              >
+                <Image 
+                  source={option.image} 
+                  style={styles.moodImage} 
+                  resizeMode="contain" 
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Title Input */}
+        <View style={styles.titleSection}>
+          <TextInput
+            style={styles.titleInput}
+            placeholder="제목을 입력하세요"
+            value={headline}
+            onChangeText={setHeadline}
+            placeholderTextColor="#FFB6C1"
+          />
+        </View>
+
+        {/* Content Input */}
+        <View style={styles.contentWrapper}>
+          <TextInput
+            style={styles.contentInput}
+            placeholder="일기를 작성해주세요..."
+            value={content}
+            onChangeText={setContent}
+            multiline
+            placeholderTextColor="#FFB6C1"
+          />
+        </View>
+
+        {/* Privacy Options */}
+        <View style={styles.privacySection}>
+          {['Private', 'Couple'].map((option) => (
+            <TouchableOpacity
+              key={option}
+              style={[
+                styles.privacyOption,
+                privacy === option && styles.privacyOptionSelected
+              ]}
+              onPress={() => setPrivacy(option as 'Private' | 'Couple')}
+            >
+              <Text style={[
+                styles.privacyText,
+                privacy === option && styles.privacyTextSelected
+              ]}>
+                {option}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Action Buttons */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.saveButtonText}>저장하기</Text>
           </TouchableOpacity>
-        ))}
-      </View>
-
-      <View style={styles.privacyContainer}>
-        {['Private', 'Couple'].map((option) => (
-          <TouchableOpacity
-            key={option}
-            style={[
-              styles.privacyOption,
-              styles.boxShadow,
-              privacy === option && styles.privacyOptionSelected
-            ]}
-            onPress={() => setPrivacy(option as 'Private' | 'Couple')}
-          >
-            <Text style={[styles.privacyText, privacy === option && styles.privacyTextSelected]}>
-              {option}
-            </Text>
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+            <Text style={styles.deleteButtonText}>삭제하기</Text>
           </TouchableOpacity>
-        ))}
+        </View>
       </View>
-
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-        <Text style={styles.deleteButtonText}>Delete</Text>
-      </TouchableOpacity>
-      </KeyboardAvoidComponent>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-      flex: 1,
-      width: 393,
-      height: 852,
-      backgroundColor: 'white',
-      padding: 20,
-      alignSelf: 'center',
-      justifyContent: 'flex-start',
+    flex: 1,
+    backgroundColor: '#FFF5F7',
+    paddingTop: 60,
+    alignItems: 'center',
   },
-  header: {
-      width: '100%',
-      height: 57,
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginBottom: 20,
-      shadowColor: '#FAC6DC80',
-      shadowOffset: { width: 5, height: 8 },
-      shadowOpacity: 1,
-      shadowRadius: 20,
-      elevation: 10,
+  diaryCard: {
+    width: '95%',
+    flex: 0.92,
+    marginTop: 25,
+    backgroundColor: 'white',
+    borderRadius: 25,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    shadowColor: '#FFB6C1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: '#FFE5EC',
+  },
+  ribbon: {
+    zIndex: 40,
+    position: 'absolute',
+    top: -15,
+    left: '50%',
+    marginLeft: -30,
+    width: 60,
+    height: 30,
+    backgroundColor: '#FF9CB1',
+    borderRadius: 8,
+    transform: [{ rotate: '-5deg' }],
+  },
+  ribbonEnd: {
+    position: 'absolute',
+    bottom: -10,
+    left: 20,
+    width: 20,
+    height: 20,
+    backgroundColor: '#FF9CB1',
+    transform: [{ rotate: '45deg' }],
+  },
+  navigationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  dateContainer: {
+    backgroundColor: '#FFE5EC',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#FFB6C1',
   },
   dateText: {
-      fontSize: 18,
-      fontWeight: 'bold',
+    fontSize: 18,
+    color: '#FF6699',
+    fontWeight: '600',
   },
-  inputContainer: {
-      marginBottom: 15,
-      padding: 10,
-      backgroundColor: 'white',
-      borderRadius: 20,
-      shadowColor: '#FF5C85',
-      shadowOffset: { width: 8, height: 8 },
-      shadowOpacity: 0.2,
-      shadowRadius: 10,
-      elevation: 5,
-  },
-  inputHeadline: {
-      backgroundColor: '#FFF',
-      padding: 12,
-      borderRadius: 8,
-      fontSize: 16,
-      borderBottomWidth: 0.5,
-      borderBottomColor : 'lightgray'
-  },
-  inputContent: {
-      backgroundColor: '#FFF',
-      padding: 12,
-      borderRadius: 8,
-      fontSize: 16,
-      minHeight: 300,
-      textAlignVertical: 'top',
-      borderTopWidth : 1,
-      borderTopColor: 'gray',
-      marginBottom: 16,
+  emotionSection: {
+    marginVertical: 20,
+    width: '100%',
   },
   moodContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      marginBottom: 20,
-      padding: 10,
-      backgroundColor: 'white',
-      borderRadius: 20,
-      shadowColor: '#FF5C85',
-      shadowOffset: { width: 8, height: 8 },
-      shadowOpacity: 0.2,
-      shadowRadius: 10,
-      elevation: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingHorizontal: 10,
   },
   moodButton: {
     padding: 8,
-    borderRadius: 8,
-    backgroundColor: '#ffffff', // 기본 배경색 지정
+    borderRadius: 15,
+    backgroundColor: '#FFE5EC',
     borderWidth: 1,
-    borderColor: '#FAC6DC',
-    marginHorizontal: 8,
+    borderColor: '#FFB6C1',
   },
   moodButtonSelected: {
-    backgroundColor: '#FAC6DC', // 선택됐을 때의 배경색 지정
+    backgroundColor: '#FF9CB1',
+    borderColor: '#FF8BA7',
   },
-  privacyContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      marginBottom: 20,
-      padding: 10,
-      backgroundColor: 'white',
-      borderRadius: 20,
-      shadowColor: '#FF5C85',
-      shadowOffset: { width: 8, height: 8 },
-      shadowOpacity: 0.2,
-      shadowRadius: 10,
-      elevation: 5,
+  moodImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  titleSection: {
+    width: '100%',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  titleInput: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#FF6699',
+    padding: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: '#FFE5EC',
+  },
+  contentWrapper: {
+    flex: 1,
+    backgroundColor: '#FFE5EC',
+    borderRadius: 20,
+    padding: 15,
+    marginHorizontal: 10,
+    marginBottom: 20,
+  },
+  contentInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#666',
+    lineHeight: 24,
+    textAlignVertical: 'top',
+  },
+  privacySection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 20,
+    marginBottom: 20,
   },
   privacyOption: {
-      padding: 8,
-      borderRadius: 8,
-      backgroundColor: '#FFF',
-      borderWidth: 1,
-      borderColor: '#FAC6DC',
-      marginHorizontal: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 15,
+    backgroundColor: '#FFE5EC',
+    borderWidth: 1,
+    borderColor: '#FFB6C1',
   },
   privacyOptionSelected: {
-      backgroundColor: '#FAC6DC',
+    backgroundColor: '#FF9CB1',
+    borderColor: '#FF8BA7',
   },
   privacyText: {
-      fontSize: 16,
-      color: '#555',
+    fontSize: 16,
+    color: '#FF6699',
+    fontWeight: '500',
   },
   privacyTextSelected: {
-      color: '#000',
-      fontWeight: 'bold',
+    color: 'white',
+    fontWeight: '600',
+  },
+  buttonContainer: {
+    gap: 10,
+    paddingHorizontal: 10,
   },
   saveButton: {
-      backgroundColor: '#F6A5C0',
-      padding: 12,
-      borderRadius: 8,
-      alignItems: 'center',
-      marginTop: 10,
-      marginBottom: 15,
-      shadowColor: '#FF5C85',
-      shadowOffset: { width: 8, height: 8 },
-      shadowOpacity: 0.2,
-      shadowRadius: 10,
-      elevation: 5,
+    backgroundColor: '#FF9CB1',
+    paddingVertical: 12,
+    borderRadius: 15,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FF8BA7',
   },
   saveButtonText: {
-      color: '#FFF',
-      fontSize: 16,
-      fontWeight: 'bold',
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
   deleteButton: {
     backgroundColor: 'white',
-    opacity: 0.7,
-    padding: 12,
-    borderRadius: 8,
-    borderColor:'red',
-    borderWidth: 1,
+    paddingVertical: 12,
+    borderRadius: 15,
     alignItems: 'center',
-    marginBottom: 15,
-    shadowColor: '#FF5C85',
-    shadowOffset: { width: 8, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#FF6666',
   },
   deleteButtonText: {
-      color: 'red',
-      fontSize: 16,
-      fontWeight: 'bold',
-  },
-  boxShadow: {
-      shadowColor: '#FAC6DC80',
-      shadowOffset: { width: 5, height: 8 },
-      shadowOpacity: 1,
-      shadowRadius: 20,
-      elevation: 10,
+    color: '#FF6666',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

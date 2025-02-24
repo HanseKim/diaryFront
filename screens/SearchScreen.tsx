@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  FlatList,  // ScrollView 제거하고 FlatList만 사용
+  FlatList,
   Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -48,11 +48,9 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         );
         setDiaryData(sortedData);
         setFilteredResults(sortedData); 
-      } else {
-
       }
     } catch (error) {
-
+      console.error('Error fetching diary data:', error);
     }
   };
 
@@ -63,17 +61,16 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         if (user) {
           const parsedUser = JSON.parse(user);
           setUser_id(parsedUser.id);
-          fetchDiaryData(parsedUser.id); // user_id가 설정된 후에 요청을 보냅니다.
+          fetchDiaryData(parsedUser.id);
         }
       } catch (error) {
-
+        console.error('Error getting user info:', error);
       }
     };
 
     getUserInfo();
   }, []);
 
-  // 검색 버튼 클릭 시 실행
   const handleSearch = () => {
     const results = diaryData.filter((diary) =>
       diary.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -81,7 +78,6 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     setFilteredResults(results);
   };
 
-  // 검색된 아이템 클릭 시 상세 화면으로 이동
   const handleItemPress = (item: DiaryEntry) => {
     navigation.navigate('Detail', {
       clickdate: parseInt(item.diary_date.split('-')[2], 10),
@@ -99,46 +95,53 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* 검색 입력창 */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="검색할 일기의 제목을 입력하세요"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-          <Image
-            source={require('../images/Search.png')}
-            style={{ width: 24, height: 24 }}
+      <View style={styles.searchCard}>
+        <View style={styles.ribbon}>
+          <View style={styles.ribbonEnd} />
+        </View>
+        
+        {/* 검색 입력창 */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="검색할 일기의 제목을 입력하세요"
+            placeholderTextColor="#FF9CB1"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
           />
-        </TouchableOpacity>
-      </View>
-
-      {/* 검색 결과 */}
-      <FlatList
-        style={{width:"100%"}}
-        data={filteredResults}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.resultContainer}
-            onPress={() => handleItemPress(item)}
-          >
-            <View style={styles.resultContent}>
-            <Image 
-              source={feelingMap[item.feeling]} 
-              style={styles.resultMood}
-              resizeMode="contain"
+          <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+            <Image
+              source={require('../images/Search.png')}
+              style={styles.searchIcon}
             />
-              <View>
-                <Text style={styles.resultDate}>{item.diary_date}</Text>
-                <Text style={styles.resultHeadline}>{item.title}</Text>
-              </View>
-            </View>
           </TouchableOpacity>
-        )}
-      />
+        </View>
+
+        {/* 검색 결과 */}
+        <FlatList
+          style={styles.resultsList}
+          data={filteredResults}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.resultContainer}
+              onPress={() => handleItemPress(item)}
+            >
+              <View style={styles.resultContent}>
+                <Image 
+                  source={feelingMap[item.feeling]} 
+                  style={styles.resultMood}
+                  resizeMode="contain"
+                />
+                <View style={styles.textContainer}>
+                  <Text style={styles.resultDate}>{item.diary_date}</Text>
+                  <Text style={styles.resultHeadline}>{item.title}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -146,44 +149,87 @@ const SearchScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
-    paddingTop: 20,
-    paddingRight: 20,
-    paddingLeft: 20,
+    backgroundColor: '#FFF5F7',
+    paddingTop: 60,
     alignItems: 'center',
   },
+  searchCard: {
+    width: '95%',
+    flex: 0.92,
+    marginTop: 25,
+    backgroundColor: 'white',
+    borderRadius: 25,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    shadowColor: '#FFB6C1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: '#FFE5EC',
+  },
+  ribbon: {
+    zIndex: 40,
+    position: 'absolute',
+    top: -15,
+    left: '50%',
+    marginLeft: -30,
+    width: 60,
+    height: 30,
+    backgroundColor: '#FF9CB1',
+    borderRadius: 8,
+    transform: [{ rotate: '-5deg' }],
+  },
+  ribbonEnd: {
+    position: 'absolute',
+    bottom: -10,
+    left: 20,
+    width: 20,
+    height: 20,
+    backgroundColor: '#FF9CB1',
+    transform: [{ rotate: '45deg' }],
+  },
   searchContainer: {
-    width: "100%",
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
-    paddingHorizontal: 10,
+    backgroundColor: '#FFE5EC',
     borderRadius: 20,
-    shadowColor: '#FF5C85',
-    shadowOffset: {
-      width: 8,
-      height: 8,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 10,
+    paddingHorizontal: 15,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#FFB6C1',
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    color: '#FF6699',
   },
   searchButton: {
-    backgroundColor: '#F6A5C0',
+    backgroundColor: '#FF9CB1',
     padding: 10,
     borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#FF8BA7',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  searchIcon: {
+    width: 24,
+    height: 24,
+    tintColor: 'white',
+  },
+  resultsList: {
+    width: '100%',
   },
   resultContainer: {
-    width: "100%",
-    alignItems: 'center'
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   resultContent: {
     width: '95%',
@@ -191,30 +237,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFF',
     padding: 15,
-    marginTop: 5,
-    marginBottom: 15,
     borderRadius: 20,
-    shadowColor: '#FF5C85',
-    shadowOffset: {
-      width: 10,
-      height: 8,
-    },
+    borderWidth: 1,
+    borderColor: '#FFE5EC',
+    shadowColor: '#FFB6C1',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 8,
+    shadowRadius: 4,
+    elevation: 3,
   },
   resultMood: {
     width: 40,
     height: 40,
     marginRight: 15,
   },
+  textContainer: {
+    flex: 1,
+  },
   resultDate: {
     fontSize: 14,
-    color: '#888',
+    color: '#FF9CB1',
+    marginBottom: 4,
   },
   resultHeadline: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#FF6699',
   },
 });
 

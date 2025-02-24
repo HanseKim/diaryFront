@@ -86,23 +86,40 @@ const PreDiaryQuestionsScreen: React.FC<{ navigation: any }> = ({ navigation }) 
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.Text} onPress={handlePrevDate}>◀</Text>
-                <Text style={styles.dateText}>{formatDate(date)}</Text>
-                <Text style={styles.Text} onPress={handleNextDate}>▶</Text>
-            </View>
-
-            {randomQuestions.map((question, index) => (
-                <View key={index} style={styles.questionContainer}>
-                    <Text style={styles.questionText}>{question}</Text>
+        <View style={[styles.container,{justifyContent:'center'}]}>
+            <View style={[styles.diaryCard, { flex: 0.8 }]}>
+                <View style={styles.ribbon}>
+                    <View style={styles.ribbonEnd} />
                 </View>
-            ))}
 
-            <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-                <Text style={styles.nextButtonText}>Next →</Text>
-            </TouchableOpacity>
-        </SafeAreaView>
+                {/* Date Header */}
+                <View style={styles.navigationHeader}>
+                    <TouchableOpacity onPress={handlePrevDate} style={styles.navButton}>
+                        <Text style={styles.navButtonText}>◀</Text>
+                    </TouchableOpacity>
+                    <View style={styles.dateContainer}>
+                        <Text style={styles.dateText}>{formatDate(date)}</Text>
+                    </View>
+                    <TouchableOpacity onPress={handleNextDate} style={styles.navButton}>
+                        <Text style={styles.navButtonText}>▶</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* Questions */}
+                <View style={styles.questionsSection}>
+                    {randomQuestions.map((question, index) => (
+                        <View key={index} style={styles.questionBox}>
+                            <Text style={styles.questionText}>{question}</Text>
+                        </View>
+                    ))}
+                </View>
+
+                {/* Next Button */}
+                <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+                    <Text style={styles.nextButtonText}>다음으로</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 };
 
@@ -202,328 +219,319 @@ const WriteDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, na
 
 
     return (
-        <SafeAreaView style={styles.container}>
-            <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    style={{flex:1}}
-                  >
-                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                        <View style={{flex:1}}>
-                            <View style={styles.header}>
-                                <Text style={styles.Text} onPress={handlePrevDate}>◀</Text>
-                                <Text style={styles.dateText}>{formatDate(date)}</Text>
-                                <Text style={styles.Text} onPress={handleNextDate}>▶</Text>
-                            </View>
-                            <View style={{marginBottom: 15,
-                                padding: 10,
-                                backgroundColor: 'white',
-                                borderRadius: 20,
-                                shadowColor: '#FF5C85',
-                                shadowOffset: {
-                                width: 8,
-                                height: 8,
-                                },
-                                shadowOpacity: 0.2,
-                                shadowRadius: 10,
-                                elevation: 5,}}>
-                                <TextInput
-                                    style={styles.inputHeadline}
-                                    placeholder="Headline"
-                                    value={headline}
-                                    placeholderTextColor="#F6A5C0" 
-                                    onChangeText={setHeadline}
+        <View style={styles.container}>
+            <View style={styles.diaryCard}>
+                <View style={styles.ribbon}>
+                    <View style={styles.ribbonEnd} />
+                </View>
+    
+                {/* Date Header */}
+                <View style={styles.navigationHeader}>
+                    <TouchableOpacity onPress={handlePrevDate} style={styles.navButton}>
+                        <Text style={styles.navButtonText}>◀</Text>
+                    </TouchableOpacity>
+                    <View style={styles.dateContainer}>
+                        <Text style={styles.dateText}>{formatDate(date)}</Text>
+                    </View>
+                    <TouchableOpacity onPress={handleNextDate} style={styles.navButton}>
+                        <Text style={styles.navButtonText}>▶</Text>
+                    </TouchableOpacity>
+                </View>
+    
+                {/* Mood Selection */}
+                <View style={styles.emotionSection}>
+                    <View style={styles.moodContainer}>
+                        {moodOptions.map((option, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                style={[
+                                    styles.moodButton,
+                                    mood === option.value && styles.moodButtonSelected
+                                ]}
+                                onPress={() => setMood(option.value)}
+                            >
+                                <Image 
+                                    source={option.image} 
+                                    style={styles.moodImage} 
+                                    resizeMode="contain" 
                                 />
-
-                                <TextInput
-                                    style={styles.inputContent}
-                                    placeholder="Start typing..."
-                                    value={content}
-                                    placeholderTextColor="#F6A5C0" 
-                                    onChangeText={setContent}
-                                    multiline
-                                />
-                            </View>
-                        
-                            <View style={styles.moodContainer}>
-                                {moodOptions.map((option, index) => (
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={[
-                                        styles.moodButton,
-                                        mood === option.value && styles.moodButtonSelected,
-                                        ]}
-                                        onPress={() => setMood(option.value)}
-                                    >
-                                        <Image
-                                        source={option.image}
-                                        style={{ width: 40, height: 40 }}
-                                        resizeMode="contain"
-                                        />
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-
-                            <View style={styles.privacyContainer}>
-                                {['Private', 'Couple'].map((option) => (
-                                    <TouchableOpacity
-                                    key={option}
-                                    style={[
-                                        styles.privacyOption,
-                                        styles.boxShadow,
-                                        privacy === option && styles.privacyOptionSelected // 조건부 스타일링
-                                    ]}
-                                    onPress={() => setPrivacy(option as 'Private' | 'Couple')}
-                                    >
-                                    <Text
-                                        style={[
-                                        styles.privacyText,
-                                        privacy === option && styles.privacyTextSelected // 텍스트 스타일도 조건부 적용
-                                        ]}
-                                    >
-                                        {option}
-                                    </Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-                            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                                <Text style={styles.saveButtonText}>Save</Text>
                             </TouchableOpacity>
-                        </View>
-            </TouchableWithoutFeedback>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+                        ))}
+                    </View>
+                </View>
+    
+                {/* Title & Content Input */}
+                <View style={styles.titleSection}>
+                    <TextInput
+                        style={styles.titleInput}
+                        placeholder="제목을 입력하세요"
+                        value={headline}
+                        onChangeText={setHeadline}
+                        placeholderTextColor="#FFB6C1"
+                    />
+                </View>
+    
+                <View style={styles.contentWrapper}>
+                    <TextInput
+                        style={styles.contentInput}
+                        placeholder="일기를 작성해주세요..."
+                        value={content}
+                        onChangeText={setContent}
+                        multiline
+                        placeholderTextColor="#FFB6C1"
+                    />
+                </View>
+    
+                {/* Privacy Options */}
+                <View style={styles.privacySection}>
+                    {['Private', 'Couple'].map((option) => (
+                        <TouchableOpacity
+                            key={option}
+                            style={[
+                                styles.privacyOption,
+                                privacy === option && styles.privacyOptionSelected
+                            ]}
+                            onPress={() => setPrivacy(option as 'Private' | 'Couple')}
+                        >
+                            <Text style={[
+                                styles.privacyText,
+                                privacy === option && styles.privacyTextSelected
+                            ]}>
+                                {option}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+    
+                {/* Save Button */}
+                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                    <Text style={styles.saveButtonText}>저장하기</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        width: 393,
-        height: 852,
-        backgroundColor: 'white',
-        // borderRadius: 30,
-        // borderTopRightRadius: 0,
-        // borderBottomRightRadius: 0,
-        padding: 20,
-        alignSelf: 'center',
-        justifyContent: 'flex-start',
-        gap: 0,
+        backgroundColor: '#FFF5F7',
+        paddingTop: 60,
+        alignItems: 'center',
     },
-    header: {
-        width: '100%',
-        height: 57,
+    diaryCard: {
+        width: '95%',
+        flex: 0.92,
+        marginTop: 25,
+        backgroundColor: 'white',
+        borderRadius: 25,
+        paddingVertical: 20,
+        paddingHorizontal: 15,
+        shadowColor: '#FFB6C1',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 5,
+        borderWidth: 2,
+        borderColor: '#FFE5EC',
+    },
+    ribbon: {
+        zIndex: 40,
+        position: 'absolute',
+        top: -15,
+        left: '50%',
+        marginLeft: -30,
+        width: 60,
+        height: 30,
+        backgroundColor: '#FF9CB1',
+        borderRadius: 8,
+        transform: [{ rotate: '-5deg' }],
+    },
+    ribbonEnd: {
+        position: 'absolute',
+        bottom: -10,
+        left: 20,
+        width: 20,
+        height: 20,
+        backgroundColor: '#FF9CB1',
+        transform: [{ rotate: '45deg' }],
+    },
+    navigationHeader: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 10,
-        marginBottom: 20,
-        shadowColor: '#FAC6DC80',
-        shadowOffset: { width: 5, height: 8 },
-        shadowOpacity: 1,
-        shadowRadius: 20,
-        elevation: 10,
-    },
-    Text: {
-        fontFamily: 'Manrope',
-        fontSize: 17,
-        lineHeight: 24,
-    },
-    dateText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    questionContainer: {
-        height : "20%",
-        justifyContent: 'center',
         marginBottom: 15,
-        padding: 10,
-        backgroundColor: 'white',
+    },
+    navButton: {
+        width: 45,
+        height: 45,
+        backgroundColor: '#FFE5EC',
+        borderRadius: 23,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#FFB6C1',
+    },
+    navButtonText: {
+        fontSize: 18,
+        color: '#FF6699',
+    },
+    dateContainer: {
+        backgroundColor: '#FFE5EC',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
         borderRadius: 20,
-        shadowColor: '#FF5C85',
-        shadowOffset: {
-        width: 8,
-        height: 8,
-        },
+        borderWidth: 1,
+        borderColor: '#FFB6C1',
+    },
+    questionsSection: {
+        flex: 1,
+        justifyContent: 'space-around',
+        paddingVertical: 15,
+        paddingHorizontal: 10,
+        gap: 15, // 질문들 사이의 간격
+    },
+    questionBox: {
+        flex: 0.25,
+        backgroundColor: '#FFE5EC',
+        justifyContent: 'center',
+        padding: 15,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: '#FFB6C1',
+        // 그림자 효과 추가
+        shadowColor: '#FFB6C1',
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
-        shadowRadius: 10,
-        elevation: 8,
+        shadowRadius: 4,
+        elevation: 3,
     },
     questionText: {
         fontSize: 16,
-        fontWeight: 'bold',
+        color: '#FF6699',
+        lineHeight: 24,
+        textAlign: 'center',
+        fontWeight: '500',
     },
     nextButton: {
-        backgroundColor: '#F6A5C0',
-        padding: 12,
-        borderRadius: 8,
+        backgroundColor: '#FF9CB1',
+        paddingVertical: 12,
+        borderRadius: 15,
         alignItems: 'center',
-        marginTop: 20,
-        marginBottom: 15,
-        shadowColor: '#FF5C85',
-        shadowOffset: {
-        width: 8,
-        height: 8,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-        elevation: 10,
+        borderWidth: 1,
+        borderColor: '#FF8BA7',
+        marginHorizontal: 10,
+        marginTop: 10, // 버튼 위 여백 추가
     },
     nextButtonText: {
-        color: '#FFF',
+        color: 'white',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: '600',
     },
-    inputHeadline: {
-        backgroundColor: '#FFF',
-        padding: 12,
-        borderRadius: 8,
-        fontSize: 16,
-        borderBottomWidth: 1,
+    dateText: {
+        width: 50,
+        textAlign: 'center',
+        fontSize: 18,
+        color: '#FF6699',
+        fontWeight: '600',
     },
-    inputContent: {
-        backgroundColor: '#FFF',
-        padding: 12,
-        borderRadius: 8,
-        fontSize: 16,
-        minHeight: 300,
-        textAlignVertical: 'top',
-        marginBottom: 16,
+    emotionSection: {
+        marginVertical: 15,
+        width: '100%',
     },
     moodContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between', // Changed from space-around
-        alignItems: 'center', // Added for vertical alignment
-        marginBottom: 20,
+        justifyContent: 'space-around',
+        backgroundColor: '#FFE5EC',
         padding: 15,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        shadowColor: '#FF5C85',
-        shadowOffset: {
-            width: 8,
-            height: 8,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-        elevation: 5,
-        width: '100%', // Added to ensure full width
+        borderRadius: 15,
+        marginBottom: 15,
     },
     moodButton: {
-        padding: 5, // Reduced padding
-        borderRadius: 8,
-        backgroundColor: '#FFF',
-        shadowColor: '#FAC6DC80',
-        shadowOffset: { width: 5, height: 8 },
-        shadowOpacity: 1,
-        shadowRadius: 20,
-        elevation: 10,
+        padding: 8,
+        borderRadius: 15,
+        backgroundColor: 'white',
         borderWidth: 1,
-        borderColor: '#FAC6DC',
-        width: 55, // Fixed width
-        height: 55, // Fixed height
-        alignItems: 'center', // Center the image
-        justifyContent: 'center', // Center the image
+        borderColor: '#FFB6C1',
     },
     moodButtonSelected: {
-        backgroundColor: '#FAC6DC',
+        backgroundColor: '#FF9CB1',
+        borderColor: '#FF8BA7',
     },
-    moodText: {
-        fontSize: 24,
-    },
-    privacyContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginBottom: 20,
-        padding: 10,
-        backgroundColor: 'white',
+    moodImage: {
         borderRadius: 20,
-        shadowColor: '#FF5C85',
-        shadowOffset: {
-        width: 8,
-        height: 8,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-        elevation: 5,
+        width: 40,
+        height: 40,
+    },
+    titleSection: {
+        width: '100%',
+        paddingHorizontal: 20,
+        marginBottom: 15,
+    },
+    titleInput: {
+        fontSize: 24,
+        fontWeight: '600',
+        color: '#FF6699',
+        padding: 10,
+        borderBottomWidth: 2,
+        borderBottomColor: '#FFE5EC',
+    },
+    contentWrapper: {
+        flex: 1,
+        backgroundColor: '#FFE5EC',
+        borderRadius: 20,
+        padding: 15,
+        marginHorizontal: 10,
+        marginBottom: 15,
+    },
+    contentInput: {
+        flex: 1,
+        fontSize: 16,
+        color: '#666',
+        lineHeight: 24,
+        textAlignVertical: 'top',
+    },
+    privacySection: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 20,
+        marginBottom: 15,
     },
     privacyOption: {
-        padding: 8,
-        borderRadius: 8,
-        backgroundColor: '#FFF',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 15,
+        backgroundColor: '#FFE5EC',
         borderWidth: 1,
-        borderColor: '#FAC6DC',
-        marginHorizontal: 8,
+        borderColor: '#FFB6C1',
     },
     privacyOptionSelected: {
-        backgroundColor: '#FAC6DC',
+        backgroundColor: '#FF9CB1',
+        borderColor: '#FF8BA7',
     },
     privacyText: {
         fontSize: 16,
-        color: '#555',
+        color: '#FF6699',
+        fontWeight: '500',
     },
     privacyTextSelected: {
-        color: '#000',
-        fontWeight: 'bold',
+        color: 'white',
+        fontWeight: '600',
     },
     saveButton: {
-        backgroundColor: '#F6A5C0',
-        padding: 12,
-        borderRadius: 8,
+        backgroundColor: '#FF9CB1',
+        paddingVertical: 12,
+        borderRadius: 15,
         alignItems: 'center',
-        marginTop: 10,
-        marginBottom: 15,
-        shadowColor: '#FF5C85',
-        shadowOffset: {
-        width: 8,
-        height: 8,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-        elevation: 5,
+        borderWidth: 1,
+        borderColor: '#FF8BA7',
+        marginHorizontal: 10,
     },
     saveButtonText: {
-        color: '#FFF',
+        color: 'white',
         fontSize: 16,
-        fontWeight: 'bold',
-    },
-    reviewContainer: {
-        backgroundColor: '#FFF',
-        padding: 20,
-        borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
-        marginBottom: 20,
-    },
-    reviewDate: {
-        fontSize: 16,
-        color: '#888',
-        marginBottom: 10,
-    },
-    reviewMood: {
-        fontSize: 24,
-        marginBottom: 10,
-    },
-    reviewHeadline: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    reviewContent: {
-        fontSize: 16,
-        marginBottom: 10,
-    },
-    reviewPrivacy: {
-        fontSize: 14,
-        color: '#888',
-    },
-    boxShadow: {
-        shadowColor: '#FAC6DC80',
-        shadowOffset: { width: 5, height: 8 },
-        shadowOpacity: 1,
-        shadowRadius: 20,
-        elevation: 10,
+        fontWeight: '600',
     },
 });
 

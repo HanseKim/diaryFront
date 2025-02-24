@@ -2,44 +2,35 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './screens/LoginScreen';
-import MainTabNavigator from './navigators/MainTabNavigator';
-import DiaryDetailScreen from './screens/DiaryDetail';
 import SignUpScreen from './screens/SignUpScreen';
 import RegisterScreen from './screens/RegisterScreen';
-import { initializeNotifications } from './utils/notification'; 
-import { useFCMListener } from './utils/notification'; // 🔹 Recoil 내부에서 호출하도록 변경
+import MainTabNavigator from './navigators/MainTabNavigator';
+import { initializeNotifications } from './utils/notification';
+import { useFCMListener } from './utils/notification';
 import { AppProvider } from './contexts/appContext';
-import MessageScreen from './screens/MessageScreen';
-import { WriteDiaryScreen } from './screens/WriteDiaryScreen';
-import EditDiaryScreen from './screens/EditDiaryScreen';
 import { setupForegroundNotificationListener } from './utils/notification';
 import { RecoilRoot } from 'recoil';
 import { useTokenRefresh } from './utils/tokenManager';
+import { LogBox } from 'react-native';
 
-import { LogBox } from 'react-native'; // 경고문 제거
-
-type RootStackParamList = {
+type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
-  Main: undefined;
-  Detail: undefined;
   SignUp: undefined;
-  Message: undefined;
-  WriteDiaryScreen: undefined;
-  EditDiaryScreen: undefined;
+  Main: undefined;
 };
 
-const Stack = createStackNavigator<RootStackParamList>();
+const AuthStack = createStackNavigator<AuthStackParamList>();
 
 function App(): React.JSX.Element {
-  useTokenRefresh(); 
+  useTokenRefresh();
 
   useEffect(() => {
     async function setupNotifications() {
       await initializeNotifications();
       setupForegroundNotificationListener();
     }
-    LogBox.ignoreAllLogs();    
+    LogBox.ignoreAllLogs();
     setupNotifications();
   }, []);
 
@@ -47,35 +38,28 @@ function App(): React.JSX.Element {
     <RecoilRoot>
       <AppProvider>
         <NavigationContainer>
-          {/* 🔹 여기서 Recoil 내부에서 `useFCMListener` 실행 */}
-          <FCMListenerWrapper /> 
-
-          <Stack.Navigator 
+          <FCMListenerWrapper />
+          <AuthStack.Navigator
             initialRouteName="Login"
             screenOptions={{
               headerShown: false,
               cardStyle: { backgroundColor: '#fff' },
             }}
           >
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
-            <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerTitle: '' }} />
-            <Stack.Screen name="Detail" component={DiaryDetailScreen} />
-            <Stack.Screen name="Message" component={MessageScreen} />
-            <Stack.Screen name="WriteDiaryScreen" component={WriteDiaryScreen} />
-            <Stack.Screen name="EditDiaryScreen" component={EditDiaryScreen} />
-          </Stack.Navigator>
+            <AuthStack.Screen name="Login" component={LoginScreen} />
+            <AuthStack.Screen name="Register" component={RegisterScreen} />
+            <AuthStack.Screen name="SignUp" component={SignUpScreen} />
+            <AuthStack.Screen name="Main" component={MainTabNavigator} />
+          </AuthStack.Navigator>
         </NavigationContainer>
       </AppProvider>
     </RecoilRoot>
   );
 }
 
-// 🔹 Recoil 내부에서 실행되도록 분리한 컴포넌트
 const FCMListenerWrapper = () => {
-  useFCMListener(); 
-  return null; // UI 요소 없이 리스너만 실행
+  useFCMListener();
+  return null;
 };
 
 export default App;

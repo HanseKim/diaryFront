@@ -62,7 +62,6 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
       
       if (currentUserInfo?.id) {
         const response = await apiClient.get(`/mypage/${currentUserInfo.id}`);
-        
         if (response.data.success) {
           const updatedUserInfo = {
             ...currentUserInfo,
@@ -81,7 +80,6 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
           setCoupleName(updatedUserInfo.coupleName || "");
           setCoupleMonth(updatedUserInfo.couple_month || 0);
           setCoupleAll(updatedUserInfo.couple_all || 0);
-          
           const days = calculateDaysPassed(updatedUserInfo);
           setDaysPassed(days + 1);
         }
@@ -118,7 +116,7 @@ const MyInfoScreen: React.FC<{ route: any, navigation: any }> = ({ route, naviga
     }, [])
   );
   
-  const updateUserInfo = async (newDate: string, coupleName : any) => {
+  const updateUserInfo = async (newDate: string, coupleName : string) => {
     try {
       const response = await apiClient.post("/mypage/all", {
         nickname: userInfo.nickname,

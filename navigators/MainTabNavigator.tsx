@@ -1,23 +1,52 @@
 import React from 'react';
-import { Image, SafeAreaView, Text, StyleSheet } from 'react-native';
+import { Image, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import { PreDiaryQuestionsScreen } from '../screens/WriteDiaryScreen';
 import ChatScreen from '../screens/ChatScreen';
 import MyInfoScreen from '../screens/MyInfoScreen';
+import DiaryDetailScreen from '../screens/DiaryDetail';
+import MessageScreen from '../screens/MessageScreen';
+import { WriteDiaryScreen } from '../screens/WriteDiaryScreen';
+import EditDiaryScreen from '../screens/EditDiaryScreen';
 
-type MainTabParamList = {
-  Home: undefined;
-  Search: undefined;
-  Write: undefined;
-  Chat: undefined;
-  MyInfo: undefined;
-};
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-const BottomTab = createBottomTabNavigator<MainTabParamList>();
+// 각 탭에 대한 스택 네비게이터
+const HomeStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="HomeScreen" component={HomeScreen} />
+    <Stack.Screen name="Detail" component={DiaryDetailScreen} />
+    <Stack.Screen name="EditDiaryScreen" component={EditDiaryScreen} />
+  </Stack.Navigator>
+);
 
-const icons = {
+const ChatStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="ChatScreen" component={ChatScreen} />
+    <Stack.Screen name="Message" component={MessageScreen} />
+  </Stack.Navigator>
+);
+
+const WriteStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="PreDiaryQuestions" component={PreDiaryQuestionsScreen} />
+    <Stack.Screen name="WriteDiaryScreen" component={WriteDiaryScreen} />
+  </Stack.Navigator>
+);
+
+// const icons = {
+//   Home: require('../images/Homebtn.png'),
+//   Search: require('../images/Search.png'),
+//   Write: require('../images/Diarybtn.png'),
+//   Chat: require('../images/Chatbtn.png'),
+//   MyInfo: require('../images/Mypagebtn.png'),
+// };
+
+const icons: { [key: string]: any } = {
   Home: require('../images/Homebtn.png'),
   Search: require('../images/Search.png'),
   Write: require('../images/Diarybtn.png'),
@@ -27,30 +56,33 @@ const icons = {
 
 function MainTabNavigator(): React.JSX.Element {
   return (
-    <BottomTab.Navigator
+    <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: '#F5BFD9',
         tabBarInactiveTintColor: '#999',
         tabBarStyle: styles.tabBarStyle,
         tabBarIcon: ({ focused }) => (
-          <Image source={icons[route.name]} style={styles.icon} />
+          <Image
+            source={icons[route.name]}
+            style={styles.icon}
+          />
         ),
       })}
     >
-      <BottomTab.Screen name="Home" component={HomeScreen} />
-      <BottomTab.Screen name="Search" component={SearchScreen} />
-      <BottomTab.Screen name="Write" component={PreDiaryQuestionsScreen} />
-      <BottomTab.Screen name="Chat" component={ChatScreen} />
-      <BottomTab.Screen name="MyInfo" component={MyInfoScreen} />
-    </BottomTab.Navigator>
+      <Tab.Screen name="Home" component={HomeStack} />
+      <Tab.Screen name="Search" component={SearchScreen} />
+      <Tab.Screen name="Write" component={WriteStack} />
+      <Tab.Screen name="Chat" component={ChatStack} />
+      <Tab.Screen name="MyInfo" component={MyInfoScreen} />
+    </Tab.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
   tabBarStyle: {
     backgroundColor: '#fff',
-    height: 70, // % 대신 px로 고정
+    height: 80, // % 대신 px로 고정
   },
   icon: {
     width: 24,

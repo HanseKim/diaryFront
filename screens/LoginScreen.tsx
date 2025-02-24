@@ -7,7 +7,9 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
-  KeyboardAvoidingViewComponent
+  KeyboardAvoidingViewComponent,
+  Dimensions,
+  ImageBackground
 } from 'react-native';
 import LoginInputScreen from '../components/LoginInputScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,76 +18,56 @@ import messaging from '@react-native-firebase/messaging';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import KeyboardAvoidComponent from '../components/KeyboardAvoidComponent';
 
+
+const { width, height } = Dimensions.get('window');
+
 const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigation }) => {
   const [user, setUser] = useState(null);
 
   // FCM 토큰 가져오기 함수
   async function getFCMToken() {
     try {
-      // 먼저 디바이스를 원격 메시지용으로 등록
       await messaging().registerDeviceForRemoteMessages();
-
-      // 그 다음 권한 요청
       const authStatus = await messaging().requestPermission();
       const enabled =
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
       if (enabled) {
-        // 권한이 있는 경우에만 토큰 요청
         const token = await messaging().getToken();
-
         return token;
       } else {
-
         return null;
       }
     } catch (error) {
-
       return null;
     }
   }
 
   // 자동 로그인 체크
   const checkAutoLogin = async () => {
-
     const uid = await AsyncStorage.getItem("userid");
     const upwd = await AsyncStorage.getItem("userpwd");
     try {
       if (uid != null && upwd != null) {
         const loginResult = await login(uid, upwd);
-
-
-        // loginResult와 token이 있는지 확인
-        // 로그인 성공 여부 체크
         if (!loginResult) {
           await AsyncStorage.multiRemove(['jwtToken', 'userid', 'userpwd', 'userInfo']);
           throw new Error('Login response is invalid');
         }
-        else {
-
-          const fcmToken = await getFCMToken();
-          //Alert.alert(String(fcmToken));
-          if (fcmToken) {
-            try {
-              await setFcm(fcmToken);
-
-            } catch (fcmError) {
-
-              // FCM 토큰 저장 실패는 로그인 진행에 영향을 주지 않도록 함
-            }
-          }
-
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Main' }],
-          });
+        const fcmToken = await getFCMToken();
+        if (fcmToken) {
+          try {
+            await setFcm(fcmToken);
+          } catch (fcmError) {}
         }
-      }
-    }
-    catch (error) {
 
-    }
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Main' }],
+        });
+      }
+    } catch (error) {}
   };
 
   // 로그인 처리 함수
@@ -93,26 +75,16 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
     try {
       const lowerCaseId = id.toLowerCase();
       const loginResult = await login(lowerCaseId, password);
-
       if (!loginResult) {
         throw new Error('Login response is invalid');
       }
-
-      // FCM 토큰 획득 및 서버 저장
       const fcmToken = await getFCMToken();
-      //Alert.alert(String(fcmToken));
-
       if (fcmToken) {
         try {
           await setFcm(fcmToken);
-
-        } catch (fcmError) {
-
-          // FCM 토큰 저장 실패는 로그인 진행에 영향을 주지 않도록 함
-        }
+        } catch (fcmError) {}
       }
 
-      // 네비게이션은 한 번만 실행
       navigation.reset({
         index: 0,
         routes: [{ name: 'Main' }],
@@ -135,42 +107,42 @@ const LoginScreen: React.FC<{ route: any, navigation: any }> = ({ route, navigat
       index: 0,
       routes: [{ name: 'Register' }],
     });
-  }
+  };
 
   useEffect(() => {
     checkAutoLogin();
   }, []);
 
   return (
-    <KeyboardAvoidComponent>
-    <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.backgroundContainer}>
-          <Image
-            source={require('../images/bg_pinkwave.png')}
-            style={styles.backgroundImage}
-          />
-        </View>
-        <View style={styles.contentContainer}>
-          <Image source={require('../images/logo.png')} style={styles.logo} />
-          <LoginInputScreen
-            onLogin={handleLogin}
-            goRegister={goRegister}
-          />
-        </View>
-      </ScrollView>
-    </View>
-    </KeyboardAvoidComponent>
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidComponent>
+        <ImageBackground
+          source={require('../images/bg_pinkwave.png')}
+          style={styles.backgroundImage}
+          imageStyle={styles.imageStyle}
+        >
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.contentContainer}>
+              <Image source={require('../images/logo.png')} style={styles.logo} />
+              <LoginInputScreen
+                onLogin={handleLogin}
+                goRegister={goRegister}
+              />
+            </View>
+          </ScrollView>
+        </ImageBackground>
+      </KeyboardAvoidComponent>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
   },
   backgroundContainer: {
     position: 'absolute',
@@ -178,10 +150,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    flex: 1, // 부모 요소에 flex: 1 추가
   },
   backgroundImage: {
-    width: '100%',
-    height: '100%',
+    width: width,
+    height: height,
+    resizeMode: 'cover',
+  },
+  imageStyle: {
     resizeMode: 'cover',
   },
   scrollContainer: {
@@ -190,13 +166,41 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    width: '100%',
+    width: '80%',
     alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 100,
   },
   logo: {
-    width: 400,
-    height: "40%",
-  }
+    width: 300,
+    height: 150,
+    marginBottom: 40, // 로고 아래 여백 추가
+  },
+  input: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 25, // 둥근 모서리
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    fontSize: 16,
+    borderColor: '#FFB6C1', // 부드러운 핑크색 테두리
+    borderWidth: 2,
+  },
+  button: {
+    backgroundColor: '#FF7D7D', // 핑크톤의 버튼
+    paddingVertical: 15,
+    paddingHorizontal: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 30,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
 });
 
 export default LoginScreen;

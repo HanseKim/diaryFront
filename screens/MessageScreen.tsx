@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { io } from "socket.io-client";
 import { AppContext } from "../contexts/appContext";
@@ -145,95 +146,171 @@ const MessageScreen: React.FC<{ route: any, navigation: any }> = ({ route, navig
     </View>
   );
 
-  return (
-    <KeyboardAvoidComponent>
-        {/* 채팅 메시지 리스트 */}
-        <FlatList
-          ref={flatListRef} // FlatList에 ref 연결
-          data={messages} // messages 배열을 전달
-          keyExtractor={(item) => item.id}
-          renderItem={({ item, index }) => renderMessage(item, index)}
-          contentContainerStyle={styles.chatList}
-          showsVerticalScrollIndicator={true}
-          nestedScrollEnabled={true}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })} // 콘텐츠 크기 변경 시 스크롤
-        />
-
-        {/* 입력창 및 전송 버튼 */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Type a message..."
-            value={message}
-            onChangeText={setMessage}
-            onSubmitEditing={sendMessage}
-            returnKeyType="send"
+  return ( //SafeAreaView
+    <SafeAreaView  style={styles.container}>
+      <KeyboardAvoidComponent>
+        <View style={styles.messageCard}>
+          <View style={styles.ribbon}>
+            <View style={styles.ribbonEnd} />
+          </View>
+          
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item, index }) => (
+              <View style={[
+                styles.messageContainer,
+                item.user == userid 
+                  ? styles.sentMessage
+                  : styles.receivedMessage
+              ]}>
+                <View style={styles.messageContent}>
+                  <Text style={styles.messageText}>{item.text}</Text>
+                  <Text style={styles.messageTime}>{item.date}</Text>
+                </View>
+              </View>
+            )}
+            contentContainerStyle={styles.chatList}
+            showsVerticalScrollIndicator={true}
+            nestedScrollEnabled={true}
+            onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
           />
-          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-            <Text style={styles.sendButtonText}>Send</Text>
-          </TouchableOpacity>
+  
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="메시지를 입력하세요..."
+              placeholderTextColor="#FF9CB1"
+              value={message}
+              onChangeText={setMessage}
+              onSubmitEditing={sendMessage}
+              returnKeyType="send"
+            />
+            <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+              <Text style={styles.sendButtonText}>전송</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidComponent>
+    </SafeAreaView>
   );
+  
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: '#FFF5F7',
+    paddingTop: 20,
+  },
+  messageCard: {
+    flex: 1,
+    margin: 15,
+    backgroundColor: 'white',
+    borderRadius: 25,
+    padding: 15,
+    shadowColor: '#FFB6C1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: '#FFE5EC',
+  },
+  ribbon: {
+    position: 'absolute',
+    top: -15,
+    left: '50%',
+    marginLeft: -30,
+    width: 60,
+    height: 30,
+    backgroundColor: '#FF9CB1',
+    borderRadius: 8,
+    transform: [{ rotate: '-5deg' }],
+    zIndex: 1,
+  },
+  ribbonEnd: {
+    position: 'absolute',
+    bottom: -10,
+    left: 20,
+    width: 20,
+    height: 20,
+    backgroundColor: '#FF9CB1',
+    transform: [{ rotate: '45deg' }],
   },
   chatList: {
     padding: 10,
-    flex: 18, // 채팅 리스트가 화면 전체를 사용하도록 설정
-    justifyContent: "flex-end", // 채팅이 아래에서 시작되도록 정렬
+    flexGrow: 1,
   },
   messageContainer: {
     marginVertical: 5,
-    padding: 10,
-    backgroundColor: "white",
+    maxWidth: '80%',
+  },
+  sentMessage: {
+    alignSelf: 'flex-end',
+  },
+  receivedMessage: {
+    alignSelf: 'flex-start',
+  },
+  messageContent: {
+    backgroundColor: 'white',
     borderRadius: 20,
+    padding: 12,
     borderWidth: 1,
-    borderColor: "#F5BFD9",
-    shadowColor: "#F5BFD9",
-    shadowOffset: {
-      width: 8,
-      height: 8,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    elevation: 8,
+    borderColor: '#FFE5EC',
+    shadowColor: '#FFB6C1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   messageText: {
-    fontWeight: '100',
-    fontSize: 16,
+    fontSize: 15,
+    color: '#FF6699',
+    marginBottom: 4,
+  },
+  messageTime: {
+    fontSize: 11,
+    color: '#FF9CB1',
+    alignSelf: 'flex-end',
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    paddingBottom: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
     borderTopWidth: 1,
-    borderColor: "#ddd",
-    backgroundColor: "#fff",
+    borderColor: '#FFE5EC',
+    backgroundColor: 'white',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
   },
   input: {
     flex: 1,
     height: 40,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: "#F5BFD9",
+    paddingHorizontal: 15,
+    backgroundColor: '#FFF5F7',
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#FFE5EC',
+    color: '#FF6699',
   },
   sendButton: {
     marginLeft: 10,
     paddingVertical: 10,
-    paddingHorizontal: 15,
-    backgroundColor: "#F5BFD9",
+    paddingHorizontal: 20,
+    backgroundColor: '#FF9CB1',
     borderRadius: 20,
+    shadowColor: '#FFB6C1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sendButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
   },
 });
 
