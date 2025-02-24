@@ -9,6 +9,8 @@ import {
   Alert,
   Image,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { apiClient } from '../utils/apiClient';
 import KeyboardAvoidComponent from '../components/KeyboardAvoidComponent';
@@ -126,96 +128,98 @@ const EditDiaryScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
     { value: 5, image: veryhappy },
   ];
   return (
-    <View style={styles.container}>
-      <View style={styles.diaryCard}>
-        <View style={styles.ribbon}>
-          <View style={styles.ribbonEnd} />
-        </View>
-
-        {/* Date Header */}
-        <View style={styles.navigationHeader}>
-          <View style={styles.dateContainer}>
-            <Text style={styles.dateText}>{formatDate(date)}</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <View style={styles.diaryCard}>
+          <View style={styles.ribbon}>
+            <View style={styles.ribbonEnd} />
           </View>
-        </View>
 
-        {/* Mood Selection */}
-        <View style={styles.emotionSection}>
-          <View style={styles.moodContainer}>
-            {moodOptions.map((option, index) => (
+          {/* Date Header */}
+          <View style={styles.navigationHeader}>
+            <View style={styles.dateContainer}>
+              <Text style={styles.dateText}>{formatDate(date)}</Text>
+            </View>
+          </View>
+
+          {/* Mood Selection */}
+          <View style={styles.emotionSection}>
+            <View style={styles.moodContainer}>
+              {moodOptions.map((option, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.moodButton,
+                    mood === option.value && styles.moodButtonSelected
+                  ]}
+                  onPress={() => setMood(option.value)}
+                >
+                  <Image 
+                    source={option.image} 
+                    style={styles.moodImage} 
+                    resizeMode="contain" 
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Title Input */}
+          <View style={styles.titleSection}>
+            <TextInput
+              style={styles.titleInput}
+              placeholder="제목을 입력하세요"
+              value={headline}
+              onChangeText={setHeadline}
+              placeholderTextColor="#FFB6C1"
+            />
+          </View>
+
+          {/* Content Input */}
+          <View style={styles.contentWrapper}>
+            <TextInput
+              style={styles.contentInput}
+              placeholder="일기를 작성해주세요..."
+              value={content}
+              onChangeText={setContent}
+              multiline
+              placeholderTextColor="#FFB6C1"
+            />
+          </View>
+
+          {/* Privacy Options */}
+          <View style={styles.privacySection}>
+            {['Private', 'Couple'].map((option) => (
               <TouchableOpacity
-                key={index}
+                key={option}
                 style={[
-                  styles.moodButton,
-                  mood === option.value && styles.moodButtonSelected
+                  styles.privacyOption,
+                  privacy === option && styles.privacyOptionSelected
                 ]}
-                onPress={() => setMood(option.value)}
+                onPress={() => setPrivacy(option as 'Private' | 'Couple')}
               >
-                <Image 
-                  source={option.image} 
-                  style={styles.moodImage} 
-                  resizeMode="contain" 
-                />
+                <Text style={[
+                  styles.privacyText,
+                  privacy === option && styles.privacyTextSelected
+                ]}>
+                  {option}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
-        </View>
 
-        {/* Title Input */}
-        <View style={styles.titleSection}>
-          <TextInput
-            style={styles.titleInput}
-            placeholder="제목을 입력하세요"
-            value={headline}
-            onChangeText={setHeadline}
-            placeholderTextColor="#FFB6C1"
-          />
-        </View>
-
-        {/* Content Input */}
-        <View style={styles.contentWrapper}>
-          <TextInput
-            style={styles.contentInput}
-            placeholder="일기를 작성해주세요..."
-            value={content}
-            onChangeText={setContent}
-            multiline
-            placeholderTextColor="#FFB6C1"
-          />
-        </View>
-
-        {/* Privacy Options */}
-        <View style={styles.privacySection}>
-          {['Private', 'Couple'].map((option) => (
-            <TouchableOpacity
-              key={option}
-              style={[
-                styles.privacyOption,
-                privacy === option && styles.privacyOptionSelected
-              ]}
-              onPress={() => setPrivacy(option as 'Private' | 'Couple')}
-            >
-              <Text style={[
-                styles.privacyText,
-                privacy === option && styles.privacyTextSelected
-              ]}>
-                {option}
-              </Text>
+          {/* Action Buttons */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+              <Text style={styles.saveButtonText}>저장하기</Text>
             </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Action Buttons */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>저장하기</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-            <Text style={styles.deleteButtonText}>삭제하기</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+              <Text style={styles.deleteButtonText}>삭제하기</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
